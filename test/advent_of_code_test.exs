@@ -9,7 +9,11 @@ defmodule AdventOfCodeTest do
     assert AdventOfCode.advanced_trebuchet_calibration_number() == 54100
   end
 
-  test "Day 1, part 1: Cube Conundrum" do
+  test "Day 2, part 1: Cube Conundrum" do
     assert AdventOfCode.cube_conundrum() == 2061
+  end
+
+  test "Day 2, part 2: Cude Conundrum continues" do
+    assert AdventOfCode.cube_conundrum_continues() == 72596
   end
 end
