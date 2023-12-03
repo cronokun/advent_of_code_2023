@@ -20,4 +20,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.AdvancedTrebuchet.answer()
   end
+
+  def cube_conundrum do
+    "priv/02_cube_game_records"
+    |> File.read!()
+    |> AdventOfCode.CubeConundrum.answer()
+  end
 end
