@@ -38,4 +38,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.GearRatios.answer()
   end
+
+  def final_gear_ratios do
+    "priv/03_engine_schematic"
+    |> File.read!()
+    |> AdventOfCode.GearRatios.final_answer()
+  end
 end

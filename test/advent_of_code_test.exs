@@ -20,4 +20,8 @@ defmodule AdventOfCodeTest do
   test "Day 3, part 1: Gear Ratios" do
     assert AdventOfCode.gear_ratios() == 546_312
   end
+
+  test "Day 3, part 2: Gear Ratios" do
+    assert AdventOfCode.final_gear_ratios() == 87_449_461
+  end
 end

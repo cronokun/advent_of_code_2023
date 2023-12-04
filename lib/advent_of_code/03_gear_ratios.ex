@@ -43,6 +43,44 @@ defmodule AdventOfCode.GearRatios do
 
   Of course, the actual engine schematic is much larger. **What is the sum of all
   of the part numbers in the engine schematic**?
+
+  ## Part 2
+
+  The engineer finds the missing part and installs it in the engine! As the engine
+  springs to life, you jump in the closest gondola, finally ready to ascend to
+  the water source.
+
+  You don't seem to be going very fast, though. Maybe something is still wrong?
+  Fortunately, the gondola has a phone labeled "help", so you pick it up and
+  the engineer answers.
+
+  Before you can explain the situation, she suggests that you look out the window.
+  There stands the engineer, holding a phone in one hand and waving with the other.
+  You're going so slowly that you haven't even left the station. You exit the gondola.
+
+  The missing part wasn't the only issue - one of the gears in the engine is wrong.
+  A gear is any `*` symbol that is adjacent to exactly two part numbers. Its gear ratio
+  is the result of multiplying those two numbers together.
+
+  This time, you need to find the gear ratio of every gear and add them all up
+  so that the engineer can figure out which gear needs to be replaced.
+
+  Consider the same engine schematic again:
+
+      467..114..
+      ...*......
+      ..35..633.
+      ......#...
+      617*......
+      .....+.58.
+      ..592.....
+      ......755.
+      ...$.*....
+      .664.598..
+
+  In this schematic, there are two gears. The first is in the top left; it has part numbers 467 and 35, so its gear ratio is 16345. The second gear is in the lower right; its gear ratio is 451490. (The * adjacent to 617 is not a gear because it is only adjacent to one part number.) Adding up all of the gear ratios produces 467835.
+
+  **What is the sum of all of the gear ratios in your engine schematic?**
   """
 
   defguardp is_adjusent(l, r, idx) when idx in l..r or idx + 1 == l or idx - 1 == r
@@ -53,7 +91,23 @@ defmodule AdventOfCode.GearRatios do
          numbers <- get_number_indexes(lines),
          symbols <- get_symbol_indexes(lines),
          part_numbers <- get_part_numbers(lines, numbers, symbols) do
-      get_sum(part_numbers, 0)
+      Enum.reduce(part_numbers, 0, fn n, sum ->
+        sum + (n |> Integer.parse() |> elem(0))
+      end)
+    end
+  end
+
+  @doc "Sum of all gear ratios"
+  def final_answer(input) do
+    with lines <- split_to_lines(input),
+         numbers <- get_number_indexes(lines),
+         gears <- get_gear_indexes(lines),
+         gear_pair <- get_gear_pairs(lines, numbers, gears) do
+      Enum.reduce(gear_pair, 0, fn {a, b}, sum ->
+        na = a |> Integer.parse() |> elem(0)
+        nb = b |> Integer.parse() |> elem(0)
+        sum + na * nb
+      end)
     end
   end
 
@@ -86,6 +140,17 @@ defmodule AdventOfCode.GearRatios do
     end
   end
 
+  defp get_gear_indexes(lines) do
+    for {num, line} <- lines, into: %{} do
+      indexes =
+        Regex.scan(~r/\*/, line, return: :index)
+        |> List.flatten()
+        |> Enum.map(fn {i, _len} -> i end)
+
+      {num, indexes}
+    end
+  end
+
   defp get_part_numbers(lines, numbers, symbols) do
     for {num, indexes} <- symbols,
         n <- [num - 1, num, num + 1],
@@ -98,16 +163,28 @@ defmodule AdventOfCode.GearRatios do
     |> Enum.map(&elem(&1, 0))
   end
 
+  defp get_gear_pairs(lines, numbers, gears) do
+    for {num, gears_in_line} <- gears,
+        idx <- gears_in_line,
+        uniq: true do
+      parts =
+        for n <- [num - 1, num, num + 1],
+            range <- List.wrap(numbers[n]) do
+          return_part_number_for(lines[n], range, idx, n)
+        end
+        |> Enum.reject(&is_nil/1)
+
+      case parts do
+        [{a, _}, {b, _}] -> {a, b}
+        _ -> nil
+      end
+    end
+    |> Enum.reject(&is_nil/1)
+  end
+
   defp return_part_number_for(line, l..r = range, idx, n)
        when is_adjusent(l, r, idx) and not is_nil(line),
        do: {String.slice(line, range), {range, n}}
 
   defp return_part_number_for(_line, _range, _idx, _n), do: nil
-
-  defp get_sum([], sum), do: sum
-
-  defp get_sum([n | rest], sum) do
-    {number, ""} = Integer.parse(n)
-    get_sum(rest, sum + number)
-  end
 end

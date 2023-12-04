@@ -43,4 +43,21 @@ defmodule AdventOfCode.GearRatiosTest do
 
     assert answer(input) == 120 * 3
   end
+
+  test ".final_answer/1 returns sum of all gear ratios" do
+    input = ~S"""
+    467..114..
+    ...*......
+    ..35..633.
+    ......#...
+    617*......
+    .....+.58.
+    ..592.....
+    ......755.
+    ...$.*....
+    .664.598..
+    """
+
+    assert final_answer(input) == 467_835
+  end
 end
