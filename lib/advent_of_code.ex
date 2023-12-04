@@ -32,4 +32,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.CubeConundrum.second_answer()
   end
+
+  def gear_ratios do
+    "priv/03_engine_schematic"
+    |> File.read!()
+    |> AdventOfCode.GearRatios.answer()
+  end
 end

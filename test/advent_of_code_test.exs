@@ -16,4 +16,8 @@ defmodule AdventOfCodeTest do
   test "Day 2, part 2: Cude Conundrum continues" do
     assert AdventOfCode.cube_conundrum_continues() == 72596
   end
+
+  test "Day 3, part 1: Gear Ratios" do
+    assert AdventOfCode.gear_ratios() == 546_312
+  end
 end
