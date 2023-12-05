@@ -50,4 +50,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.Scratchcards.answer()
   end
+
+  def final_scratchcards do
+    "priv/04_cards_pile"
+    |> File.read!()
+    |> AdventOfCode.Scratchcards.final_answer()
+  end
 end

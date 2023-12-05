@@ -28,4 +28,8 @@ defmodule AdventOfCodeTest do
   test "Day 4, part 1: Scratchcards" do
     assert AdventOfCode.scratchcards() == 21568
   end
+
+  test "Day 4, part 2: Correct Scratchcards" do
+    assert AdventOfCode.final_scratchcards() == 11_827_296
+  end
 end
