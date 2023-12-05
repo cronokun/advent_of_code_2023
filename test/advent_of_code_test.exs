@@ -24,4 +24,8 @@ defmodule AdventOfCodeTest do
   test "Day 3, part 2: Gear Ratios" do
     assert AdventOfCode.final_gear_ratios() == 87_449_461
   end
+
+  test "Day 4, part 1: Scratchcards" do
+    assert AdventOfCode.scratchcards() == 21568
+  end
 end

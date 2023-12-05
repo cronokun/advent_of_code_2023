@@ -44,4 +44,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.GearRatios.final_answer()
   end
+
+  def scratchcards do
+    "priv/04_cards_pile"
+    |> File.read!()
+    |> AdventOfCode.Scratchcards.answer()
+  end
 end
