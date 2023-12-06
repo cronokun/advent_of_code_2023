@@ -56,4 +56,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.Scratchcards.final_answer()
   end
+
+  def food_production_problem do
+    "priv/05_almanach"
+    |> File.read!()
+    |> AdventOfCode.FoodProductionProblem.answer()
+  end
 end
