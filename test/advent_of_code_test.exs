@@ -36,4 +36,8 @@ defmodule AdventOfCodeTest do
   test "Day 5, part 1: Food production problem" do
     assert AdventOfCode.food_production_problem() == 484_023_871
   end
+
+  test "Day 5, part 2: FInal food production problem" do
+    assert AdventOfCode.final_food_production_problem() == 46_294_175
+  end
 end

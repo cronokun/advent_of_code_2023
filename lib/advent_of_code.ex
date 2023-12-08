@@ -62,4 +62,10 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.FoodProductionProblem.answer()
   end
+
+  def final_food_production_problem do
+    "priv/05_almanach"
+    |> File.read!()
+    |> AdventOfCode.BiggerFoodProductionProblem.answer()
+  end
 end
