@@ -111,7 +111,7 @@ defmodule AdventOfCode.WaitForIt do
   def answer(input) do
     input
     |> parse_input()
-    |> Enum.map(&win_numbers/1)
+    |> Enum.map(&wins_count/1)
     |> Enum.product()
   end
 
@@ -119,17 +119,17 @@ defmodule AdventOfCode.WaitForIt do
   def final_answer(input) do
     input
     |> parse_input(join: true)
-    |> win_numbers()
+    |> wins_count()
   end
 
-  defp win_numbers({time, record}) do
+  defp wins_count({time, record}) do
     for hold_time <- 0..time,
         move_time = time - hold_time,
         distance = move_time * hold_time,
-        distance > record do
-      distance
+        distance > record,
+        reduce: 0 do
+      count -> count + 1
     end
-    |> length
   end
 
   # ---- Parser ----
