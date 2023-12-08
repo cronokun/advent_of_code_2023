@@ -37,7 +37,11 @@ defmodule AdventOfCodeTest do
     assert AdventOfCode.food_production_problem() == 484_023_871
   end
 
-  test "Day 5, part 2: FInal food production problem" do
+  test "Day 5, part 2: Final food production problem" do
     assert AdventOfCode.final_food_production_problem() == 46_294_175
+  end
+
+  test "Day 6, part 1: Wait for it" do
+    assert AdventOfCode.wait_for_it() == 3_316_275
   end
 end

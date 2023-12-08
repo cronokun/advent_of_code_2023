@@ -68,4 +68,9 @@ defmodule AdventOfCode do
     |> File.read!()
     |> AdventOfCode.BiggerFoodProductionProblem.answer()
   end
+
+  def wait_for_it do
+    File.read!("priv/06_race_records")
+    |> AdventOfCode.WaitForIt.answer()
+  end
 end
