@@ -73,4 +73,9 @@ defmodule AdventOfCode do
     File.read!("priv/06_race_records")
     |> AdventOfCode.WaitForIt.answer()
   end
+
+  def realy_wait_for_it do
+    File.read!("priv/06_race_records")
+    |> AdventOfCode.WaitForIt.final_answer()
+  end
 end

@@ -44,4 +44,8 @@ defmodule AdventOfCodeTest do
   test "Day 6, part 1: Wait for it" do
     assert AdventOfCode.wait_for_it() == 3_316_275
   end
+
+  test "Day 6, part 2: Realy wait for it" do
+    assert AdventOfCode.realy_wait_for_it() == 27_102_791
+  end
 end

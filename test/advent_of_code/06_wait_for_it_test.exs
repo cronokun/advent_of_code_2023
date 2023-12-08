@@ -11,4 +11,13 @@ defmodule AdventOfCode.WaitForItTest do
 
     assert answer(input) == 288
   end
+
+  test ".final_answer/1 returns number of ways to win the race" do
+    input = ~S"""
+    Time:      7  15   30
+    Distance:  9  40  200
+    """
+
+    assert final_answer(input) == 71503
+  end
 end

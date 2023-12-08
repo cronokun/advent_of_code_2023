@@ -82,6 +82,29 @@ defmodule AdventOfCode.WaitForIt do
 
   Determine the number of ways you could beat the record in each race. **What do you get
   if you multiply these numbers together?**
+
+  ## Part 2
+
+  As the race is about to start, you realize the piece of paper with race times
+  and record distances you got earlier actually just has very bad kerning. There's
+  really only one race - ignore the spaces between the numbers on each line.
+
+  So, the example from before:
+
+      Time:      7  15   30
+      Distance:  9  40  200
+
+  ...now instead means this:
+
+      Time:      71530
+      Distance:  940200
+
+  Now, you have to figure out how many ways there are to win this single race.
+  In this example, the race lasts for 71530 milliseconds and the record distance
+  you need to beat is 940200 millimeters. You could hold the button anywhere from
+  14 to 71516 milliseconds and beat the record, a total of 71503 ways!
+
+  **How many ways can you beat the record in this one much longer race?**
   """
 
   @doc "Number of ways to win all races"
@@ -90,6 +113,13 @@ defmodule AdventOfCode.WaitForIt do
     |> parse_input()
     |> Enum.map(&win_numbers/1)
     |> Enum.product()
+  end
+
+  @doc "How many ways to win the race"
+  def final_answer(input) do
+    input
+    |> parse_input(join: true)
+    |> win_numbers()
   end
 
   defp win_numbers({time, record}) do
@@ -111,10 +141,23 @@ defmodule AdventOfCode.WaitForIt do
       line
       |> String.split(" ", trim: true)
       |> tl()
-      |> Enum.map(&strings_to_numbers/1)
+      |> Enum.map(&string_to_number/1)
     end)
     |> Enum.zip()
   end
 
-  defp strings_to_numbers(str), do: Integer.parse(str) |> elem(0)
+  defp parse_input(input, join: true) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn line ->
+      line
+      |> String.split(" ", trim: true)
+      |> tl()
+      |> Enum.join()
+      |> string_to_number()
+    end)
+    |> List.to_tuple()
+  end
+
+  defp string_to_number(str), do: Integer.parse(str) |> elem(0)
 end
