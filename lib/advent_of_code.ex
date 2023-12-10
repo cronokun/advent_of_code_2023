@@ -78,4 +78,9 @@ defmodule AdventOfCode do
     File.read!("priv/06_race_records")
     |> AdventOfCode.WaitForIt.final_answer()
   end
+
+  def camel_cards do
+    File.read!("priv/07_hands_and_bids")
+    |> AdventOfCode.CamelCards.answer()
+  end
 end
