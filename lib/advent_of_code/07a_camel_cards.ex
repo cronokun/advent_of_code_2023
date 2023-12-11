@@ -97,7 +97,7 @@ defmodule AdventOfCode.CamelCards do
   **Find the rank of every hand in your set. What are the total winnings?**
   """
 
-  @doc "TODO"
+  @doc "Total winnings"
   def answer(input) do
     input
     |> parse_input()

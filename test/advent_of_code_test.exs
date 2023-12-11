@@ -52,4 +52,8 @@ defmodule AdventOfCodeTest do
   test "Day 7, part 1: Camel cards" do
     assert AdventOfCode.camel_cards() == 251_806_792
   end
+
+  test "Day 7, part 2: Camel cards with joker" do
+    assert AdventOfCode.camel_cards_with_joker() == 252_113_488
+  end
 end

@@ -3,7 +3,6 @@ defmodule AdventOfCode.CamelCardsTest do
 
   import AdventOfCode.CamelCards
 
-  @tag :focus
   test ".answer/1 returns total winnings" do
     input = ~S"""
     32T3K 765
