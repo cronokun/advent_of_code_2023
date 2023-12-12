@@ -115,13 +115,6 @@ defmodule AdventOfCode.WaitForIt do
     |> Enum.product()
   end
 
-  @doc "How many ways to win the race"
-  def final_answer(input) do
-    input
-    |> parse_input(join: true)
-    |> wins_count()
-  end
-
   defp wins_count({time, record}) do
     for hold_time <- 0..time,
         move_time = time - hold_time,
@@ -130,6 +123,37 @@ defmodule AdventOfCode.WaitForIt do
         reduce: 0 do
       count -> count + 1
     end
+  end
+
+  @doc "How many ways to win the race"
+  def final_answer(input) do
+    input
+    |> parse_input(join: true)
+    |> better_wins_count()
+  end
+
+  # ---- Split and enumerate ----
+
+  defp better_wins_count({time, record}) do
+    win_fun = fn t -> (time - t) * t > record end
+    n = split_down(time, time, win_fun) |> lowest_win(win_fun)
+    time - 2 * n + 1
+  end
+
+  # Go half way down until we get range when lowest win number is present.
+  defp split_down(time, lowest, fun) do
+    half = div(time, 2)
+
+    if fun.(half) do
+      split_down(half, half, fun)
+    else
+      {half, lowest}
+    end
+  end
+
+  # Get lowest win number from the range.
+  defp lowest_win({a, b}, fun) when a < b do
+    if fun.(a), do: a, else: lowest_win({a + 1, b}, fun)
   end
 
   # ---- Parser ----
