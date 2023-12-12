@@ -97,4 +97,9 @@ defmodule AdventOfCode do
     File.read!("priv/07_hands_and_bids")
     |> AdventOfCode.JokerCamelCards.answer()
   end
+
+  def haunted_wastland do
+    File.read!("priv/08_desert_map")
+    |> AdventOfCode.HauntedWasteland.answer()
+  end
 end
