@@ -58,6 +58,10 @@ defmodule AdventOfCodeTest do
   end
 
   test "Day 8, part 1: Haunted wasteland" do
-    assert AdventOfCode.haunted_wastland() == 21883
+    assert AdventOfCode.haunted_wastland() == 21_883
+  end
+
+  test "Day 8, part 2: Haunted wasteland" do
+    assert AdventOfCode.final_haunted_wastland() == 12_833_235_391_111
   end
 end

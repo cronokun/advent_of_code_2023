@@ -102,4 +102,9 @@ defmodule AdventOfCode do
     File.read!("priv/08_desert_map")
     |> AdventOfCode.HauntedWasteland.answer()
   end
+
+  def final_haunted_wastland do
+    File.read!("priv/08_desert_map")
+    |> AdventOfCode.HauntedWasteland.final_answer()
+  end
 end
