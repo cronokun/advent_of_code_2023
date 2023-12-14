@@ -107,4 +107,9 @@ defmodule AdventOfCode do
     File.read!("priv/08_desert_map")
     |> AdventOfCode.HauntedWasteland.final_answer()
   end
+
+  def mirage_maintenance do
+    File.read!("priv/09_report")
+    |> AdventOfCode.MirageMaintenance.answer()
+  end
 end

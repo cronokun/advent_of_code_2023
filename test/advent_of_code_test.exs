@@ -64,4 +64,8 @@ defmodule AdventOfCodeTest do
   test "Day 8, part 2: Haunted wasteland" do
     assert AdventOfCode.final_haunted_wastland() == 12_833_235_391_111
   end
+
+  test "Day 9, part 1: Mirage Maintenance" do
+    assert AdventOfCode.mirage_maintenance() == 1_934_898_178
+  end
 end
