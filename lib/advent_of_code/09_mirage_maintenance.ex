@@ -75,29 +75,29 @@ defmodule AdventOfCode.MirageMaintenance do
 
   Finding all-zero differences for the second history requires an additional sequence:
 
-  1   3   6  10  15  21
-    2   3   4   5   6
-      1   1   1   1
-        0   0   0
+      1   3   6  10  15  21
+        2   3   4   5   6
+          1   1   1   1
+            0   0   0
 
   Then, following the same process as before, work out the next value in each sequence
   from the bottom up:
 
-  1   3   6  10  15  21  28
-    2   3   4   5   6   7
-      1   1   1   1   1
-        0   0   0   0
+      1   3   6  10  15  21  28
+        2   3   4   5   6   7
+          1   1   1   1   1
+            0   0   0   0
 
   So, the next value of the second history is 28.
 
   The third history requires even more sequences, but its next value can be found
   the same way:
 
-  10  13  16  21  30  45  68
-     3   3   5   9  15  23
-       0   2   4   6   8
-         2   2   2   2
-           0   0   0
+      10  13  16  21  30  45  68
+         3   3   5   9  15  23
+           0   2   4   6   8
+             2   2   2   2
+               0   0   0
 
   So, the next value of the third history is 68.
 
@@ -106,9 +106,39 @@ defmodule AdventOfCode.MirageMaintenance do
 
   Analyze your OASIS report and extrapolate the next value for each history.
   **What is the sum of these extrapolated values?**
+
+  ## Part 2
+
+  Of course, it would be nice to have even more history included in your report.
+  Surely it's safe to just extrapolate backwards as well, right?
+
+  For each history, repeat the process of finding differences until the sequence
+  of differences is entirely zero. Then, rather than adding a zero to the end and
+  filling in the next values of each previous sequence, you should instead add a zero
+  to the beginning of your sequence of zeroes, then fill in new first values for
+  each previous sequence.
+
+  In particular, here is what the third example history looks like when extrapolating
+  back in time:
+
+      5  10  13  16  21  30  45
+        5   3   3   5   9  15
+         -2   0   2   4   6
+            2   2   2   2
+              0   0   0
+
+  Adding the new values on the left side of each sequence from bottom to top eventually
+  reveals the new left-most history value: 5.
+
+  Doing this for the remaining example data above results in previous values of
+  -3 for the first history and 0 for the second history. Adding all three new values
+  together produces 2.
+
+  Analyze your OASIS report again, this time extrapolating the previous value for
+  each history. **What is the sum of these extrapolated values?**
   """
 
-  @doc "Sum of extrapolated history values"
+  @doc "Sum of next extrapolated history values"
   def answer(input) do
     input
     |> parse_input()
@@ -117,20 +147,43 @@ defmodule AdventOfCode.MirageMaintenance do
   end
 
   defp next_value(ns) do
-    List.last(ns) + get_diff(ns)
+    diff = ns |> get_diffs(:last, []) |> Enum.sum()
+    List.last(ns) + diff
   end
 
-  defp get_diff(ns, acc \\ []) do
+  defp get_diffs(ns, direction, acc) when direction in [:first, :last] do
     if Enum.all?(ns, &(&1 == 0)) do
-      Enum.sum(acc)
+      acc
     else
       diffs =
         ns
         |> Enum.chunk_every(2, 1, :discard)
         |> Enum.map(fn [a, b] -> b - a end)
 
-      get_diff(diffs, [List.last(diffs) | acc])
+      diff =
+        case direction do
+          :first -> List.first(diffs)
+          :last -> List.last(diffs)
+        end
+
+      get_diffs(diffs, direction, [diff | acc])
     end
+  end
+
+  @doc "Sum of previous extrapolated history values"
+  def final_answer(input) do
+    input
+    |> parse_input()
+    |> Enum.map(&prev_value/1)
+    |> Enum.sum()
+  end
+
+  defp prev_value([n | _] = ns) do
+    diff =
+      get_diffs(ns, :first, [])
+      |> Enum.reduce(0, fn n, acc -> n - acc end)
+
+    n - diff
   end
 
   # ---- Parser ----

@@ -112,4 +112,9 @@ defmodule AdventOfCode do
     File.read!("priv/09_report")
     |> AdventOfCode.MirageMaintenance.answer()
   end
+
+  def final_mirage_maintenance do
+    File.read!("priv/09_report")
+    |> AdventOfCode.MirageMaintenance.final_answer()
+  end
 end
