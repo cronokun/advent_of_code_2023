@@ -13,7 +13,6 @@ defmodule AdventOfCode.MirageMaintenanceTest do
     assert answer(input) == 114
   end
 
-  @tag :focus
   test ".final_answer/1 returns sum of previous extrapolated history values" do
     input = ~S"""
     0 3 6 9 12 15

@@ -72,4 +72,8 @@ defmodule AdventOfCodeTest do
   test "Day 9, part 2: Mirage maintenance" do
     assert AdventOfCode.final_mirage_maintenance() == 1_129
   end
+
+  test "Day 10, part 1: Pipe maze" do
+    assert AdventOfCode.pipe_maze() == 6_927
+  end
 end

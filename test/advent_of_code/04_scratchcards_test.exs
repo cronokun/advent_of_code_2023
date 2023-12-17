@@ -16,7 +16,6 @@ defmodule AdventOfCode.ScratchcardsTest do
     assert answer(input) == 13
   end
 
-  @tag :focus
   test ".final_answer/1" do
     input = ~S"""
     Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53

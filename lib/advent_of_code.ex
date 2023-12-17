@@ -117,4 +117,9 @@ defmodule AdventOfCode do
     File.read!("priv/09_report")
     |> AdventOfCode.MirageMaintenance.final_answer()
   end
+
+  def pipe_maze do
+    File.read!("priv/10_pipe_maze")
+    |> AdventOfCode.PipeMaze.answer()
+  end
 end
