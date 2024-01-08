@@ -122,4 +122,9 @@ defmodule AdventOfCode do
     File.read!("priv/10_pipe_maze")
     |> AdventOfCode.PipeMaze.answer()
   end
+
+  def final_pipe_maze do
+    File.read!("priv/10_pipe_maze")
+    |> AdventOfCode.PipeMaze.final_answer()
+  end
 end
