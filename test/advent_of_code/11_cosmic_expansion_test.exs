@@ -3,7 +3,6 @@ defmodule AdventOfCode.CosmicExpansionTest do
 
   import AdventOfCode.CosmicExpansion, only: [answer: 2]
 
-  @tag :focus
   test ".answer/1 returns sum of shortest path lengths for all galaxy pairs" do
     input = ~S"""
     ...#......

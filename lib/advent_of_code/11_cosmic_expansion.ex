@@ -160,11 +160,12 @@ defmodule AdventOfCode.CosmicExpansion do
   defp parse_input("." <> rest, acc, {x, y}), do: parse_input(rest, acc, {x + 1, y})
   defp parse_input("\n" <> rest, acc, {_x, y}), do: parse_input(rest, acc, {0, y + 1})
 
-  defp find_empty_lines(locations, {x, y}) do
-    all_xs = Range.new(0, x - 1) |> Range.to_list()
-    all_ys = Range.new(0, y - 1) |> Range.to_list()
-    reducer = fn {x, y}, {xs, ys} -> {List.delete(xs, x), List.delete(ys, y)} end
-    Enum.reduce(locations, {all_xs, all_ys}, reducer)
+  defp find_empty_lines(locations, {max_x, max_y}) do
+    gxs = for {x, _y} <- locations, do: x
+    gys = for {_x, y} <- locations, do: y
+    xs = for i <- 0..max_x, i not in gxs, do: i
+    ys = for j <- 0..max_y, j not in gys, do: j
+    {xs, ys}
   end
 
   defp all_pairs(list), do: all_pairs(list, 2)
@@ -176,8 +177,15 @@ defmodule AdventOfCode.CosmicExpansion do
   end
 
   defp calc_path([{x1, y1}, {x2, y2}], {xs, ys}, expanse) do
-    x_exp = for x <- x1..x2, x in xs, reduce: 0, do: (s -> s + expanse - 1)
-    y_exp = for y <- y1..y2, y in ys, reduce: 0, do: (s -> s + expanse - 1)
+    x_exp = calc_expantion(x1, x2, xs, expanse)
+    y_exp = calc_expantion(y1, y2, ys, expanse)
+
     abs(x1 - x2) + abs(y1 - y2) + x_exp + y_exp
+  end
+
+  defp calc_expantion(a, b, list, expanse) when a > b, do: calc_expantion(b, a, list, expanse)
+
+  defp calc_expantion(a, b, list, expanse) when a <= b do
+    Enum.reduce(list, 0, fn i, sum -> if i >= a and i <= b, do: sum + expanse - 1, else: sum end)
   end
 end
