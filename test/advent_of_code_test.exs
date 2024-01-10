@@ -84,4 +84,8 @@ defmodule AdventOfCodeTest do
   test "Day 11, part 1: Cosmic expansion" do
     assert AdventOfCode.cosmic_expansion() == 9_918_828
   end
+
+  test "Day 11, part 1: Greater cosmic expansion" do
+    assert AdventOfCode.greater_cosmic_expansion() == 692_506_533_832
+  end
 end

@@ -2,7 +2,7 @@ defmodule AdventOfCode.CosmicExpansion do
   @moduledoc ~S"""
   # Day 11: Cosmic Expansion
 
-  ## Part 1
+  ## --- Part 1 ---
 
   You continue following signs for "Hot Springs" and eventually come across an
   observatory. The Elf within turns out to be a researcher studying cosmic expansion
@@ -118,32 +118,53 @@ defmodule AdventOfCode.CosmicExpansion do
 
   Expand the universe, then find the length of the shortest path between every pair
   of galaxies. What is the sum of these lengths?
+
+
+  ## --- Part 2 ---
+
+  The galaxies are much older (and thus much farther apart) than the researcher
+  initially estimated.
+
+  Now, instead of the expansion you did before, make each empty row or column one
+  million times larger. That is, each empty row should be replaced with 1000000 empty
+  rows, and each empty column should be replaced with 1000000 empty columns.
+
+  (In the example above, if each empty row or column were merely 10 times larger,
+  the sum of the shortest paths between every pair of galaxies would be 1030. If each
+  empty row or column were merely 100 times larger, the sum of the shortest paths
+  between every pair of galaxies would be 8410. However, your universe will need
+  to expand far beyond these values.)
+
+  Starting with the same initial image, expand the universe according to these new
+  rules, then find the length of the shortest path between every pair of galaxies.
+  What is the sum of these lengths?
   """
 
   @doc "Sum of shortest paths between every pair of galaxies"
-  def answer(input) do
-    input
-    |> apply_cosmic_expansion()
-    |> find_all_galaxies()
-    |> all_pairs()
-    |> calc_paths_sum()
-  end
+  def answer(input, expanse) do
+    {galaxies, {max_x, max_y}} =
+      input
+      |> String.trim()
+      |> parse_input([], {0, 0})
 
-  defp find_all_galaxies(lines) do
-    lines
-    |> Enum.with_index()
-    |> Enum.flat_map(fn {line, y} ->
-      line
-      |> get_galaxies_on_line()
-      |> Enum.map(fn x -> {x, y} end)
-    end)
-    |> Enum.reject(&(&1 == []))
-  end
+    {empty_xs, empty_ys} =
+      find_empty_lines(galaxies, {max_x, max_y})
 
-  defp calc_paths_sum(pairs) do
-    pairs
-    |> Enum.map(&calc_shortest_path/1)
+    all_pairs(galaxies)
+    |> Enum.map(fn pair -> calc_path(pair, {empty_xs, empty_ys}, expanse) end)
     |> Enum.sum()
+  end
+
+  defp parse_input("", acc, {x, y}), do: {Enum.reverse(acc), {x, y + 1}}
+  defp parse_input("#" <> rest, acc, {x, y}), do: parse_input(rest, [{x, y} | acc], {x + 1, y})
+  defp parse_input("." <> rest, acc, {x, y}), do: parse_input(rest, acc, {x + 1, y})
+  defp parse_input("\n" <> rest, acc, {_x, y}), do: parse_input(rest, acc, {0, y + 1})
+
+  defp find_empty_lines(locations, {x, y}) do
+    all_xs = Range.new(0, x - 1) |> Range.to_list()
+    all_ys = Range.new(0, y - 1) |> Range.to_list()
+    reducer = fn {x, y}, {xs, ys} -> {List.delete(xs, x), List.delete(ys, y)} end
+    Enum.reduce(locations, {all_xs, all_ys}, reducer)
   end
 
   defp all_pairs(list), do: all_pairs(list, 2)
@@ -154,53 +175,9 @@ defmodule AdventOfCode.CosmicExpansion do
     for(l <- all_pairs(t, m - 1), do: [h | l]) ++ all_pairs(t, m)
   end
 
-  defp calc_shortest_path([{x1, y1}, {x2, y2}]), do: abs(x1 - x2) + abs(y1 - y2)
-
-  # ---- Cosmix expanse ----
-
-  defp apply_cosmic_expansion(image) do
-    image
-    |> expand_rows()
-    |> expand_columns()
-  end
-
-  def expand_rows(image) do
-    image
-    |> String.split("\n", trim: true)
-    |> Enum.reduce([], fn line, acc ->
-      if String.contains?(line, "#") do
-        [line | acc]
-      else
-        [line | [line | acc]]
-      end
-    end)
-    |> Enum.reverse()
-  end
-
-  defp expand_columns(lines) do
-    empty_columns = get_empty_columns(lines)
-    Enum.map(lines, fn line -> expand_empty_columns(line, 0, empty_columns, "") end)
-  end
-
-  defp expand_empty_columns("", _, _, acc), do: acc
-
-  defp expand_empty_columns("." <> rest, i, ixs, acc) do
-    char = if i in ixs, do: "..", else: "."
-    expand_empty_columns(rest, i + 1, ixs, acc <> char)
-  end
-
-  defp expand_empty_columns("#" <> rest, i, ixs, acc) do
-    expand_empty_columns(rest, i + 1, ixs, acc <> "#")
-  end
-
-  defp get_empty_columns(lines) do
-    len = lines |> hd() |> String.length()
-    indexes = Range.new(0, len - 1) |> Range.to_list()
-    galaxy_indexes = Enum.flat_map(lines, &get_galaxies_on_line/1)
-    indexes -- galaxy_indexes
-  end
-
-  defp get_galaxies_on_line(line) do
-    Regex.scan(~r/#/, line, return: :index) |> Enum.map(fn [{i, _}] -> i end)
+  defp calc_path([{x1, y1}, {x2, y2}], {xs, ys}, expanse) do
+    x_exp = for x <- x1..x2, x in xs, reduce: 0, do: (s -> s + expanse - 1)
+    y_exp = for y <- y1..y2, y in ys, reduce: 0, do: (s -> s + expanse - 1)
+    abs(x1 - x2) + abs(y1 - y2) + x_exp + y_exp
   end
 end

@@ -130,6 +130,11 @@ defmodule AdventOfCode do
 
   def cosmic_expansion do
     File.read!("priv/11_galaxy_image")
-    |> AdventOfCode.CosmicExpansion.answer()
+    |> AdventOfCode.CosmicExpansion.answer(2)
+  end
+
+  def greater_cosmic_expansion do
+    File.read!("priv/11_galaxy_image")
+    |> AdventOfCode.CosmicExpansion.answer(1_000_000)
   end
 end
