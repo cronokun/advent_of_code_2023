@@ -80,4 +80,8 @@ defmodule AdventOfCodeTest do
   test "Day 10, part 2: Pipe maze" do
     assert AdventOfCode.final_pipe_maze() == 467
   end
+
+  test "Day 11, part 1: Cosmic expansion" do
+    assert AdventOfCode.cosmic_expansion() == 9_918_828
+  end
 end

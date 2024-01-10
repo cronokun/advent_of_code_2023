@@ -127,4 +127,9 @@ defmodule AdventOfCode do
     File.read!("priv/10_pipe_maze")
     |> AdventOfCode.PipeMaze.final_answer()
   end
+
+  def cosmic_expansion do
+    File.read!("priv/11_galaxy_image")
+    |> AdventOfCode.CosmicExpansion.answer()
+  end
 end
