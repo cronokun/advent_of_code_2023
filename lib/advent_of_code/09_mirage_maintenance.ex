@@ -197,9 +197,6 @@ defmodule AdventOfCode.MirageMaintenance do
   defp parse_numbers_line(line) do
     line
     |> String.split(" ", trim: true)
-    |> Enum.map(fn num ->
-      {n, ""} = Integer.parse(num)
-      n
-    end)
+    |> Enum.map(&String.to_integer/1)
   end
 end

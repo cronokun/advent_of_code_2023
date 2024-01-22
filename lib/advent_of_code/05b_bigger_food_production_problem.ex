@@ -103,10 +103,7 @@ defmodule AdventOfCode.BiggerFoodProductionProblem do
   defp string_to_numbers(str) when is_binary(str) do
     str
     |> String.split(" ", trim: true)
-    |> Enum.map(fn n ->
-      {num, ""} = Integer.parse(n)
-      num
-    end)
+    |> Enum.map(&String.to_integer/1)
   end
 
   # ---- Utils --------

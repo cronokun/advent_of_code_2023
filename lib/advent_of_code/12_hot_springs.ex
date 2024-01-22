@@ -196,9 +196,6 @@ defmodule AdventOfCode.HotSprings do
   defp parse_record(string) do
     string
     |> String.split(",")
-    |> Enum.map(fn n ->
-      {num, ""} = Integer.parse(n)
-      num
-    end)
+    |> Enum.map(&String.to_integer/1)
   end
 end

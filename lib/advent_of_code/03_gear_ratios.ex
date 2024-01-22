@@ -91,9 +91,7 @@ defmodule AdventOfCode.GearRatios do
          numbers <- get_number_indexes(lines),
          symbols <- get_symbol_indexes(lines),
          part_numbers <- get_part_numbers(lines, numbers, symbols) do
-      Enum.reduce(part_numbers, 0, fn n, sum ->
-        sum + (n |> Integer.parse() |> elem(0))
-      end)
+      Enum.reduce(part_numbers, 0, fn n, sum -> sum + String.to_integer(n) end)
     end
   end
 
@@ -104,9 +102,7 @@ defmodule AdventOfCode.GearRatios do
          gears <- get_gear_indexes(lines),
          gear_pair <- get_gear_pairs(lines, numbers, gears) do
       Enum.reduce(gear_pair, 0, fn {a, b}, sum ->
-        na = a |> Integer.parse() |> elem(0)
-        nb = b |> Integer.parse() |> elem(0)
-        sum + na * nb
+        sum + String.to_integer(a) * String.to_integer(b)
       end)
     end
   end

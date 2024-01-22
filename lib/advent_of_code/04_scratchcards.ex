@@ -127,17 +127,13 @@ defmodule AdventOfCode.Scratchcards do
 
   defp parse_numbers(str) do
     Regex.scan(~r/\d+/, str)
-    |> Enum.map(fn [n] ->
-      {num, ""} = Integer.parse(n)
-      num
-    end)
+    |> Enum.map(fn [n] -> String.to_integer(n) end)
     |> Enum.sort()
   end
 
   defp parse_card_number(str) do
     [card] = Regex.run(~r/\d+/, str)
-    {num, ""} = Integer.parse(card)
-    num
+    String.to_integer(card)
   end
 
   defp get_points(lines),

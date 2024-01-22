@@ -108,7 +108,7 @@ defmodule AdventOfCode.CubeConundrum do
     {get_game_id(id_line), sets}
   end
 
-  defp get_game_id(<<"Game ", n::binary>>), do: n |> Integer.parse() |> elem(0)
+  defp get_game_id(<<"Game ", n::binary>>), do: String.to_integer(n)
 
   defp parse_set(set_line) do
     Regex.scan(~r/(\d+) (blue|green|red)/, set_line, capture: :all_but_first)
@@ -118,13 +118,13 @@ defmodule AdventOfCode.CubeConundrum do
   defp parse_set_rgb([], acc), do: acc
 
   defp parse_set_rgb([[n, color] | rest], {r, g, b}) do
-    {n, ""} = Integer.parse(n)
+    num = String.to_integer(n)
 
     acc =
       case color do
-        "red" -> {r + n, g, b}
-        "green" -> {r, g + n, b}
-        "blue" -> {r, g, b + n}
+        "red" -> {r + num, g, b}
+        "green" -> {r, g + num, b}
+        "blue" -> {r, g, b + num}
       end
 
     parse_set_rgb(rest, acc)

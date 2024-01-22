@@ -165,7 +165,7 @@ defmodule AdventOfCode.WaitForIt do
       line
       |> String.split(" ", trim: true)
       |> tl()
-      |> Enum.map(&string_to_number/1)
+      |> Enum.map(&String.to_integer/1)
     end)
     |> Enum.zip()
   end
@@ -178,10 +178,8 @@ defmodule AdventOfCode.WaitForIt do
       |> String.split(" ", trim: true)
       |> tl()
       |> Enum.join()
-      |> string_to_number()
+      |> String.to_integer()
     end)
     |> List.to_tuple()
   end
-
-  defp string_to_number(str), do: Integer.parse(str) |> elem(0)
 end

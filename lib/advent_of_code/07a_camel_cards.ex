@@ -110,10 +110,11 @@ defmodule AdventOfCode.CamelCards do
     |> String.split("\n", trim: true)
     |> Enum.map(fn line ->
       [hand, bid] = String.split(line, " ")
-      hand = String.split(hand, "", trim: true)
-      {bid, ""} = Integer.parse(bid)
 
-      {hand, bid}
+      {
+        String.split(hand, "", trim: true),
+        String.to_integer(bid)
+      }
     end)
   end
 
