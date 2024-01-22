@@ -137,4 +137,9 @@ defmodule AdventOfCode do
     File.read!("priv/11_galaxy_image")
     |> AdventOfCode.CosmicExpansion.answer(1_000_000)
   end
+
+  def hot_springs do
+    File.read!("priv/12_condition_records")
+    |> AdventOfCode.HotSprings.answer()
+  end
 end
