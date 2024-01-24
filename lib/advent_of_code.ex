@@ -142,4 +142,9 @@ defmodule AdventOfCode do
     File.read!("priv/12_condition_records")
     |> AdventOfCode.HotSprings.answer()
   end
+
+  def unfolded_hot_springs do
+    File.read!("priv/12_condition_records")
+    |> AdventOfCode.HotSprings.answer(5)
+  end
 end

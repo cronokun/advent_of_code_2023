@@ -89,8 +89,11 @@ defmodule AdventOfCodeTest do
     assert AdventOfCode.greater_cosmic_expansion() == 692_506_533_832
   end
 
-  @tag :long
   test "Day 12, part 1: Hot springs" do
     assert AdventOfCode.hot_springs() == 7007
+  end
+
+  test "Day 12, part 2: Unfolded hot springs" do
+    assert AdventOfCode.unfolded_hot_springs() == 3_476_169_006_222
   end
 end

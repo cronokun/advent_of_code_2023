@@ -114,88 +114,125 @@ defmodule AdventOfCode.HotSprings do
 
   For each row, count all of the different arrangements of operational and broken
   springs that meet the given criteria. **What is the sum of those counts?**
+
+  ## --- Part 2 ---
+
+  As you look out at the field of springs, you feel like there are way more springs
+  than the condition records list. When you examine the records, you discover that
+  they were actually folded up this whole time!
+
+  To unfold the records, on each row, replace the list of spring conditions with five
+  copies of itself (separated by `?`) and replace the list of contiguous groups of damaged
+  springs with five copies of itself (separated by `,`).
+
+  So, this row:
+
+      .# 1
+
+  Would become:
+
+      .#?.#?.#?.#?.# 1,1,1,1,1
+
+  The first line of the above example would become:
+
+      ???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3
+
+  In the above example, after unfolding, the number of possible arrangements for some
+  rows is now much larger:
+
+  - `???.### 1,1,3` - 1 arrangement
+  - `.??..??...?##. 1,1,3` - 16384 arrangements
+  - `?#?#?#?#?#?#?#? 1,3,1,6` - 1 arrangement
+  - `????.#...#... 4,1,1` - 16 arrangements
+  - `????.######..#####. 1,6,5` - 2500 arrangements
+  - `?###???????? 3,2,1` - 506250 arrangements
+
+  After unfolding, adding all of the possible arrangement counts together produces 525152.
+
+  Unfold your condition records; **what is the new sum of possible arrangement counts?**
   """
 
   @doc "Sum of all possible arrangements"
-  def answer(input) do
+  def answer(input, multiplier \\ 1) do
     input
-    |> parse_input()
-    |> Enum.map(&calc_variants/1)
+    |> parse_and_unfold_input(multiplier)
+    |> Enum.map(&process_line/1)
     |> Enum.sum()
   end
 
-  defp calc_variants({line, stats, record}) do
-    btotal = Enum.sum(record)
-    br_rem = btotal - stats.broken
-    bl_rem = stats.unknown - br_rem
-
-    uniq_perms([], {"#", br_rem}, {".", bl_rem}, [])
-    |> tap(fn list -> Enum.count(list) end)
-    |> Enum.map(fn fills -> fill_line(line, fills) end)
-    |> Enum.filter(fn line -> valid_line?(line, record) end)
-    |> Enum.count()
+  defp process_line(line) do
+    {total, _memo} = do_process(line, :any, 0, %{})
+    total
   end
 
-  # --- Uniq permutations ---
+  defp do_process({"", []}, _mode, acc, memo), do: {acc + 1, memo}
+  defp do_process({"", _ns}, _mode, acc, memo), do: {acc, memo}
+  defp do_process({<<".", _rest::binary>>, _ns}, :cont, acc, memo), do: {acc, memo}
 
-  defp uniq_perms(cur, {_a, 0}, {b, m}, acc) do
-    r = Enum.reduce(1..m, cur, fn _i, acc -> [b | acc] end) |> Enum.reverse()
-    Enum.reverse([r | acc])
+  defp do_process({<<".", rest::binary>>, ns}, _mode, acc, memo),
+    do: do_process({rest, ns}, :any, acc, memo)
+
+  defp do_process({<<"#", _rest::binary>>, []}, _mode, acc, memo), do: {acc, memo}
+  defp do_process({<<"#", _rest::binary>>, _ns}, :blank, acc, memo), do: {acc, memo}
+
+  defp do_process({<<"#", rest::binary>>, [1 | ns]}, _mode, acc, memo),
+    do: do_process({rest, ns}, :blank, acc, memo)
+
+  defp do_process({<<"#", rest::binary>>, [n | ns]}, _mode, acc, memo),
+    do: do_process({rest, [n - 1 | ns]}, :cont, acc, memo)
+
+  defp do_process({<<"?", rest::binary>>, []}, mode, acc, memo),
+    do: do_process({rest, []}, mode, acc, memo)
+
+  defp do_process({<<"?", rest::binary>>, ns}, :blank, acc, memo) do
+    do_process({rest, ns}, :any, acc, memo)
   end
 
-  defp uniq_perms(cur, {a, n}, {_b, 0}, acc) do
-    r = Enum.reduce(1..n, cur, fn _i, acc -> [a | acc] end) |> Enum.reverse()
-    Enum.reverse([r | acc])
+  defp do_process({<<"?", rest::binary>>, [1 | ns]}, :cont, acc, memo),
+    do: do_process({rest, ns}, :blank, acc, memo)
+
+  defp do_process({<<"?", rest::binary>>, [n | ns]}, :cont, acc, memo),
+    do: do_process({rest, [n - 1 | ns]}, :cont, acc, memo)
+
+  defp do_process({<<"?", rest::binary>>, ns}, mode, acc, memo) do
+    {p1, memo} = do_memoized_process({"#" <> rest, ns}, mode, acc, memo)
+    {p2, memo} = do_memoized_process({"." <> rest, ns}, mode, acc, memo)
+    {p1 + p2, memo}
   end
 
-  defp uniq_perms(cur, {a, 1}, {b, 1}, acc) do
-    v1 = [b, a | cur] |> Enum.reverse()
-    v2 = [a, b | cur] |> Enum.reverse()
-    Enum.reverse([v2, v1 | acc])
-  end
+  defp do_memoized_process(input, mode, acc, memo) do
+    case Map.get(memo, input) do
+      nil ->
+        {r, memo} = do_process(input, mode, acc, memo)
+        {r, Map.put_new(memo, input, r)}
 
-  defp uniq_perms(cur, {a, n}, {b, m}, acc) do
-    v1 = uniq_perms([a | cur], {a, n - 1}, {b, m}, acc)
-    v2 = uniq_perms([b | cur], {a, n}, {b, m - 1}, acc)
-    v1 ++ v2
-  end
-
-  # ------
-
-  defp fill_line(line, fills) do
-    Enum.reduce(fills, line, fn ch, l -> String.replace(l, "?", ch, global: false) end)
-  end
-
-  defp valid_line?(line, expected) do
-    actual =
-      line
-      |> String.split(".", trim: true)
-      |> Enum.map(&String.length/1)
-
-    actual == expected
+      val ->
+        {val, memo}
+    end
   end
 
   # --- Parser ---
 
-  defp parse_input(input) do
+  defp parse_and_unfold_input(input, multiplier) do
     input
     |> String.split("\n", trim: true)
-    |> Enum.map(&parse_line/1)
+    |> Enum.map(&parse_and_unfold_line(&1, multiplier))
   end
 
-  defp parse_line(line) do
+  defp parse_and_unfold_line(line, multiplier) when multiplier >= 1 do
     [a, b] = String.split(line, " ")
-    {a, parse_map(a, %{blank: 0, broken: 0, unknown: 0}), parse_record(b)}
+
+    substrings =
+      List.duplicate(a, multiplier)
+      |> Enum.join("?")
+
+    nums = for _n <- 1..multiplier, i <- parse_number_list(b), do: i
+    {substrings, nums}
   end
 
-  defp parse_map("", acc), do: Map.put(acc, :total, acc.blank + acc.broken + acc.unknown)
-  defp parse_map("." <> rest, acc), do: parse_map(rest, Map.update!(acc, :blank, &(&1 + 1)))
-  defp parse_map("#" <> rest, acc), do: parse_map(rest, Map.update!(acc, :broken, &(&1 + 1)))
-  defp parse_map("?" <> rest, acc), do: parse_map(rest, Map.update!(acc, :unknown, &(&1 + 1)))
-
-  defp parse_record(string) do
-    string
-    |> String.split(",")
+  defp parse_number_list(str) do
+    str
+    |> String.split(",", trim: true)
     |> Enum.map(&String.to_integer/1)
   end
 end
