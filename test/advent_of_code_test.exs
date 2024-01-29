@@ -96,4 +96,8 @@ defmodule AdventOfCodeTest do
   test "Day 12, part 2: Unfolded hot springs" do
     assert AdventOfCode.unfolded_hot_springs() == 3_476_169_006_222
   end
+
+  test "Day 13, part 1: Point of incidence" do
+    assert AdventOfCode.point_of_incidence() == 35521
+  end
 end

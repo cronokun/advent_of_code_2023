@@ -147,4 +147,9 @@ defmodule AdventOfCode do
     File.read!("priv/12_condition_records")
     |> AdventOfCode.HotSprings.answer(5)
   end
+
+  def point_of_incidence do
+    File.read!("priv/13_patterns")
+    |> AdventOfCode.PointOfIncidence.answer()
+  end
 end
