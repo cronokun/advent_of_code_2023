@@ -90,29 +90,136 @@ defmodule AdventOfCode.PointOfIncidence do
 
   Find the line of reflection in each of the patterns in your notes. **What number
   do you get after summarizing all of your notes?**
+
+  ## --- Part 2 ----
+
+  You resume walking through the valley of mirrors and - SMACK! - run directly into one.
+  Hopefully nobody was watching, because that must have been pretty embarrassing.
+
+  Upon closer inspection, you discover that every mirror has exactly one smudge: exactly
+  one `.` or `#` should be the opposite type.
+
+  In each pattern, you'll need to locate and fix the smudge that causes a different
+  reflection line to be valid. (The old reflection line won't necessarily continue
+  being valid after the smudge is fixed.)
+
+  Here's the above example again:
+
+      #.##..##.
+      ..#.##.#.
+      ##......#
+      ##......#
+      ..#.##.#.
+      ..##..##.
+      #.#.##.#.
+
+      #...##..#
+      #....#..#
+      ..##..###
+      #####.##.
+      #####.##.
+      ..##..###
+      #....#..#
+
+  The first pattern's smudge is in the top-left corner. If the top-left `#` were instead `.`,
+  it would have a different, horizontal line of reflection:
+
+      1 ..##..##. 1
+      2 ..#.##.#. 2
+      3v##......#v3
+      4^##......#^4
+      5 ..#.##.#. 5
+      6 ..##..##. 6
+      7 #.#.##.#. 7
+
+  With the smudge in the top-left corner repaired, a new horizontal line of reflection
+  between rows 3 and 4 now exists. Row 7 has no corresponding reflected row and can be
+  ignored, but every other row matches exactly: row 1 matches row 6, row 2 matches row 5,
+  and row 3 matches row 4.
+
+  In the second pattern, the smudge can be fixed by changing the fifth symbol on row 2
+  from `.` to `#`:
+
+      1v#...##..#v1
+      2^#...##..#^2
+      3 ..##..### 3
+      4 #####.##. 4
+      5 #####.##. 5
+      6 ..##..### 6
+      7 #....#..# 7
+
+  Now, the pattern has a different horizontal line of reflection between rows 1 and 2.
+
+  Summarize your notes as before, but instead use the new different reflection lines.
+  In this example, the first pattern's new horizontal line has 3 rows above it and the
+  second pattern's new horizontal line has 1 row above it, summarizing to the value 400.
+
+  In each pattern, fix the smudge and find the different line of reflection. **What number
+  do you get after summarizing the new reflection line in each pattern in your notes?**
   """
 
+  @doc "Find mirrors"
   def answer(input) do
     input
-    |> String.split("\n\n", trim: true)
-    |> Enum.reduce(0, fn block, sum ->
-      case block |> parse_input() |> find_mirror() do
-        {:horizontal, idx} -> sum + idx
-        {:vertical, idx} -> sum + idx * 100
+    |> parse_input()
+    |> Enum.reduce(0, fn block, sum -> sum + process_block(block) end)
+  end
+
+  defp process_block(block) do
+    case find_mirror(block) do
+      {:horizontal, idx} -> idx
+      {:vertical, idx} -> idx * 100
+    end
+  end
+
+  @doc "Find mirrors and fix smudges"
+  def final_answer(input) do
+    input
+    |> parse_input()
+    |> Enum.reduce(0, fn block, sum -> sum + fix_and_process_block(block) end)
+  end
+
+  defp fix_and_process_block(block) do
+    original_mirror = find_mirror(block)
+
+    block
+    |> all_smudge_variants()
+    |> Enum.reduce_while(0, fn fixed_block, _ ->
+      case find_mirror(fixed_block, original_mirror) do
+        nil -> {:cont, nil}
+        res -> {:halt, res}
       end
     end)
+    |> case do
+      {:horizontal, idx} -> idx
+      {:vertical, idx} -> idx * 100
+    end
   end
 
-  def find_mirror(lines) do
-    mirror_index(flip(lines), :horizontal) || mirror_index(lines, :vertical)
+  defp all_smudge_variants(list), do: all_smudge_variants(Enum.join(list, "\n"), "", [])
+  defp all_smudge_variants("", _pref, acc),
+    do: acc |> Enum.reverse(acc) |> Enum.map(&String.split(&1, "\n"))
+  defp all_smudge_variants(<<"0", rest::binary>>, pref, acc),
+    do: all_smudge_variants(rest, pref <> "0", [pref <> "1" <> rest | acc])
+  defp all_smudge_variants(<<"1", rest::binary>>, pref, acc),
+    do: all_smudge_variants(rest, pref <> "1", [pref <> "0" <> rest | acc])
+  defp all_smudge_variants(<<"\n", rest::binary>>, pref, acc),
+    do: all_smudge_variants(rest, pref <> "\n", acc)
+
+  # --- Find mirror ---
+
+  defp find_mirror(lines, original \\ :nope) do
+    mirror_index(flip(lines), :horizontal, original) || mirror_index(lines, :vertical, original)
   end
 
-  def mirror_index(lines, mode) do
+  defp mirror_index(lines, mode, original) do
     data = prepare_input(lines)
 
     data
     |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.find(fn [{i, a}, {_, b}] -> a == b and is_mirror?(data, i) end)
+    |> Enum.find(fn [{i, a}, {_, b}] ->
+      a == b and {mode, i} != original and is_mirror?(data, i)
+    end)
     |> case do
       nil -> nil
       [{idx, _}, _] -> {mode, idx}
@@ -132,11 +239,14 @@ defmodule AdventOfCode.PointOfIncidence do
 
   defp parse_input(input) do
     input
-    |> String.replace(["#", "."], fn
-      "#" -> "1"
-      "." -> "0"
-    end)
-    |> String.split("\n", trim: true)
+    |> String.split("\n\n", trim: true)
+    |> Enum.map(&
+      String.replace(&1, ["#", "."], fn
+        "#" -> "1"
+        "." -> "0"
+      end)
+      |> String.split("\n", trim: true)
+    )
   end
 
   defp flip(lines) do

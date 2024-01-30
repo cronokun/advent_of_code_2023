@@ -100,4 +100,8 @@ defmodule AdventOfCodeTest do
   test "Day 13, part 1: Point of incidence" do
     assert AdventOfCode.point_of_incidence() == 35521
   end
+
+  test "Day 13, part 2: Point of incidence with fixed smudge" do
+    assert AdventOfCode.fixed_point_of_incidence() == 34795
+  end
 end

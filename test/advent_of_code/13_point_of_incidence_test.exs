@@ -24,4 +24,26 @@ defmodule AdventOfCode.PointOfIncidenceTest do
 
     assert answer(input) == 405
   end
+
+  test ".final_answer/1 fixes smudge and then finds mirror" do
+    input = ~S"""
+    #.##..##.
+    ..#.##.#.
+    ##......#
+    ##......#
+    ..#.##.#.
+    ..##..##.
+    #.#.##.#.
+
+    #...##..#
+    #....#..#
+    ..##..###
+    #####.##.
+    #####.##.
+    ..##..###
+    #....#..#
+    """
+
+    assert final_answer(input) == 400
+  end
 end

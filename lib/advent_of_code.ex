@@ -152,4 +152,9 @@ defmodule AdventOfCode do
     File.read!("priv/13_patterns")
     |> AdventOfCode.PointOfIncidence.answer()
   end
+
+  def fixed_point_of_incidence do
+    File.read!("priv/13_patterns")
+    |> AdventOfCode.PointOfIncidence.final_answer()
+  end
 end
