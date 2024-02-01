@@ -162,4 +162,9 @@ defmodule AdventOfCode do
     File.read!("priv/14_platform_map")
     |> AdventOfCode.ParabolicReflectorDish.answer()
   end
+
+  def spinned_parabolic_reflector_dish do
+    File.read!("priv/14_platform_map")
+    |> AdventOfCode.ParabolicReflectorDish.final_answer(1_000_000_000)
+  end
 end

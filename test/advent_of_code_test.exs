@@ -108,4 +108,8 @@ defmodule AdventOfCodeTest do
   test "Day 14, part 1: Parabolic reflector dish" do
     assert AdventOfCode.parabolic_reflector_dish() == 107_430
   end
+
+  test "Day 14, part 2: Spinned parabolic reflector dish" do
+    assert AdventOfCode.spinned_parabolic_reflector_dish() == 96317
+  end
 end
