@@ -157,4 +157,9 @@ defmodule AdventOfCode do
     File.read!("priv/13_patterns")
     |> AdventOfCode.PointOfIncidence.final_answer()
   end
+
+  def parabolic_reflector_dish do
+    File.read!("priv/14_platform_map")
+    |> AdventOfCode.ParabolicReflectorDish.answer()
+  end
 end

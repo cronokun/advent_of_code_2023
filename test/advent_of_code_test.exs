@@ -104,4 +104,8 @@ defmodule AdventOfCodeTest do
   test "Day 13, part 2: Point of incidence with fixed smudge" do
     assert AdventOfCode.fixed_point_of_incidence() == 34795
   end
+
+  test "Day 14, part 1: Parabolic reflector dish" do
+    assert AdventOfCode.parabolic_reflector_dish() == 107_430
+  end
 end
