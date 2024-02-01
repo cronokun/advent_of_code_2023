@@ -18,7 +18,7 @@ defmodule AdventOfCode.WaitForItTest do
     Distance:  9  40  200
     """
 
-    assert final_answer(input) == 71503
+    assert final_answer(input) == 71_503
 
     input = ~S"""
     Time: 82

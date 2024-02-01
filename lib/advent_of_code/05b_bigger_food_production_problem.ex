@@ -108,6 +108,7 @@ defmodule AdventOfCode.BiggerFoodProductionProblem do
 
   # ---- Utils --------
 
+  # credo:disable-for-lines:10
   defp split_range({a1, a2} = a, {b1, b2} = b) do
     cond do
       a2 < b1 or b2 < a1 -> [{:cont, a}]

@@ -279,6 +279,7 @@ defmodule AdventOfCode.PipeMaze do
     traverse(maze, next, cur, dest, [cur | acc])
   end
 
+  # credo:disable-for-lines:20
   defp find_start_cell(maze) do
     {loc, _} = Enum.find(maze, fn {_k, v} -> v == :start end)
 
@@ -300,6 +301,7 @@ defmodule AdventOfCode.PipeMaze do
     {loc, type}
   end
 
+  # credo:disable-for-lines:20
   defp get_next_cell(maze, {{x, y} = loc, type}, {{px, py}, _prev_type}) do
     next =
       case type do

@@ -80,7 +80,12 @@ defmodule AdventOfCode.JokerCamelCards do
       |> Map.values()
       |> Enum.sort(:desc)
 
-    case {length(jokers), freq} do
+    hand_strength_with_jokers(length(jokers), freq)
+  end
+
+  # credo:disable-for-lines:30
+  defp hand_strength_with_jokers(jokers, others) do
+    case {jokers, others} do
       # Five of a kind
       {5, []} -> 7
       {4, [1]} -> 7

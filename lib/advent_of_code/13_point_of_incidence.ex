@@ -183,7 +183,7 @@ defmodule AdventOfCode.PointOfIncidence do
     original_mirror = find_mirror(block)
 
     block
-    |> all_smudge_variants()
+    |> all_smudges()
     |> Enum.reduce_while(0, fn fixed_block, _ ->
       case find_mirror(fixed_block, original_mirror) do
         nil -> {:cont, nil}
@@ -196,15 +196,18 @@ defmodule AdventOfCode.PointOfIncidence do
     end
   end
 
-  defp all_smudge_variants(list), do: all_smudge_variants(Enum.join(list, "\n"), "", [])
-  defp all_smudge_variants("", _pref, acc),
+  defp all_smudges(list), do: all_smudges(Enum.join(list, "\n"), "", [])
+
+  defp all_smudges("", _pref, acc),
     do: acc |> Enum.reverse(acc) |> Enum.map(&String.split(&1, "\n"))
-  defp all_smudge_variants(<<"0", rest::binary>>, pref, acc),
-    do: all_smudge_variants(rest, pref <> "0", [pref <> "1" <> rest | acc])
-  defp all_smudge_variants(<<"1", rest::binary>>, pref, acc),
-    do: all_smudge_variants(rest, pref <> "1", [pref <> "0" <> rest | acc])
-  defp all_smudge_variants(<<"\n", rest::binary>>, pref, acc),
-    do: all_smudge_variants(rest, pref <> "\n", acc)
+
+  defp all_smudges(<<"0", rest::binary>>, pref, acc),
+    do: all_smudges(rest, pref <> "0", [pref <> "1" <> rest | acc])
+
+  defp all_smudges(<<"1", rest::binary>>, pref, acc),
+    do: all_smudges(rest, pref <> "1", [pref <> "0" <> rest | acc])
+
+  defp all_smudges(<<"\n", rest::binary>>, pref, acc), do: all_smudges(rest, pref <> "\n", acc)
 
   # --- Find mirror ---
 
@@ -218,7 +221,7 @@ defmodule AdventOfCode.PointOfIncidence do
     data
     |> Enum.chunk_every(2, 1, :discard)
     |> Enum.find(fn [{i, a}, {_, b}] ->
-      a == b and {mode, i} != original and is_mirror?(data, i)
+      a == b and {mode, i} != original and mirror?(data, i)
     end)
     |> case do
       nil -> nil
@@ -226,26 +229,25 @@ defmodule AdventOfCode.PointOfIncidence do
     end
   end
 
-  defp is_mirror?(data, idx), do: is_mirror?(data, Enum.count(data), {idx, idx + 1}, nil)
-  defp is_mirror?(_data, _len, _idxs, false), do: false
+  defp mirror?(data, idx), do: mirror?(data, Enum.count(data), {idx, idx + 1}, nil)
+  defp mirror?(_data, _len, _idxs, false), do: false
 
-  defp is_mirror?(data, len, {a, b}, _acc) when a >= 1 and b <= len do
-    is_mirror?(data, len, {a - 1, b + 1}, data[a] == data[b])
-  end
+  defp mirror?(data, len, {a, b}, _acc) when a >= 1 and b <= len,
+    do: mirror?(data, len, {a - 1, b + 1}, data[a] == data[b])
 
-  defp is_mirror?(_data, _len, _idxs, acc), do: acc
+  defp mirror?(_data, _len, _idxs, acc), do: acc
 
   # --- Parser & Utils ---
 
   defp parse_input(input) do
     input
     |> String.split("\n\n", trim: true)
-    |> Enum.map(&
-      String.replace(&1, ["#", "."], fn
-        "#" -> "1"
-        "." -> "0"
-      end)
-      |> String.split("\n", trim: true)
+    |> Enum.map(
+      &(String.replace(&1, ["#", "."], fn
+          "#" -> "1"
+          "." -> "0"
+        end)
+        |> String.split("\n", trim: true))
     )
   end
 

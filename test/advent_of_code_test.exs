@@ -2,19 +2,19 @@ defmodule AdventOfCodeTest do
   use ExUnit.Case
 
   test "Day 1, part 1: Trebuchet Calibration Number" do
-    assert AdventOfCode.trebuchet_calibration_number() == 54877
+    assert AdventOfCode.trebuchet_calibration_number() == 54_877
   end
 
   test "Day 1, part 2: Advenced Trebuchet Calibration Number" do
-    assert AdventOfCode.advanced_trebuchet_calibration_number() == 54100
+    assert AdventOfCode.advanced_trebuchet_calibration_number() == 54_100
   end
 
   test "Day 2, part 1: Cube Conundrum" do
-    assert AdventOfCode.cube_conundrum() == 2061
+    assert AdventOfCode.cube_conundrum() == 2_061
   end
 
   test "Day 2, part 2: Cude Conundrum continues" do
-    assert AdventOfCode.cube_conundrum_continues() == 72596
+    assert AdventOfCode.cube_conundrum_continues() == 72_596
   end
 
   test "Day 3, part 1: Gear Ratios" do
@@ -26,7 +26,7 @@ defmodule AdventOfCodeTest do
   end
 
   test "Day 4, part 1: Scratchcards" do
-    assert AdventOfCode.scratchcards() == 21568
+    assert AdventOfCode.scratchcards() == 21_568
   end
 
   test "Day 4, part 2: Correct Scratchcards" do
@@ -90,7 +90,7 @@ defmodule AdventOfCodeTest do
   end
 
   test "Day 12, part 1: Hot springs" do
-    assert AdventOfCode.hot_springs() == 7007
+    assert AdventOfCode.hot_springs() == 7_007
   end
 
   test "Day 12, part 2: Unfolded hot springs" do
@@ -98,11 +98,11 @@ defmodule AdventOfCodeTest do
   end
 
   test "Day 13, part 1: Point of incidence" do
-    assert AdventOfCode.point_of_incidence() == 35521
+    assert AdventOfCode.point_of_incidence() == 35_521
   end
 
   test "Day 13, part 2: Point of incidence with fixed smudge" do
-    assert AdventOfCode.fixed_point_of_incidence() == 34795
+    assert AdventOfCode.fixed_point_of_incidence() == 34_795
   end
 
   test "Day 14, part 1: Parabolic reflector dish" do
@@ -110,6 +110,6 @@ defmodule AdventOfCodeTest do
   end
 
   test "Day 14, part 2: Spinned parabolic reflector dish" do
-    assert AdventOfCode.spinned_parabolic_reflector_dish() == 96317
+    assert AdventOfCode.spinned_parabolic_reflector_dish() == 96_317
   end
 end
