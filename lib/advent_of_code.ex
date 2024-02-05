@@ -172,4 +172,9 @@ defmodule AdventOfCode do
     File.read!("priv/15_initialization_sequence")
     |> AdventOfCode.LensLibrary.answer()
   end
+
+  def final_lens_library do
+    File.read!("priv/15_initialization_sequence")
+    |> AdventOfCode.LensLibrary.final_answer()
+  end
 end
