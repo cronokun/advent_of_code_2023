@@ -112,4 +112,8 @@ defmodule AdventOfCodeTest do
   test "Day 14, part 2: Spinned parabolic reflector dish" do
     assert AdventOfCode.spinned_parabolic_reflector_dish() == 96_317
   end
+
+  test "Day 15, part 1: Lens library" do
+    assert AdventOfCode.lens_library() == 513_214
+  end
 end
