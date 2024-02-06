@@ -120,4 +120,8 @@ defmodule AdventOfCodeTest do
   test "Day 15, part 2: Lens library focusing power" do
     assert AdventOfCode.final_lens_library() == 258_826
   end
+
+  test "Day 16, part 1: Floor will be lava" do
+    assert AdventOfCode.floor_will_be_lava() == 6_622
+  end
 end

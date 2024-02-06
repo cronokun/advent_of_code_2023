@@ -177,4 +177,8 @@ defmodule AdventOfCode do
     File.read!("priv/15_initialization_sequence")
     |> AdventOfCode.LensLibrary.final_answer()
   end
+
+  def floor_will_be_lava do
+    File.read!("priv/16_contraption_layout") |> AdventOfCode.FloorWillBeLava.answer()
+  end
 end
