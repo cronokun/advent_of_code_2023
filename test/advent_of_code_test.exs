@@ -124,4 +124,8 @@ defmodule AdventOfCodeTest do
   test "Day 16, part 1: Floor will be lava" do
     assert AdventOfCode.floor_will_be_lava() == 6_622
   end
+
+  test "Day 16, part 2: Floor really will be lava" do
+    assert AdventOfCode.floor_really_will_be_lava() == 7_130
+  end
 end

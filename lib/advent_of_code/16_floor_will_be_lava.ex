@@ -89,6 +89,49 @@ defmodule AdventOfCode.FloorWillBeLava do
   The light isn't energizing enough tiles to produce lava; to debug the contraption, you need
   to start by analyzing the current situation. With the beam starting in the top-left heading
   right, **how many tiles end up being energized?**
+
+  ## --- Part 2 ---
+
+  As you try to work out what might be wrong, the reindeer tugs on your shirt and leads you to
+  a nearby control panel. There, a collection of buttons lets you align the contraption so that
+  the beam enters from any edge tile and heading away from that edge. (You can choose either of
+  two directions for the beam if it starts on a corner; for instance, if the beam starts in the
+  bottom-right corner, it can start heading either left or upward.)
+
+  So, the beam could start on any tile in the top row (heading downward), any tile in the bottom
+  row (heading upward), any tile in the leftmost column (heading right), or any tile in the
+  rightmost column (heading left). To produce lava, you need to find the configuration that
+  energizes as many tiles as possible.
+
+  In the above example, this can be achieved by starting the beam in the fourth tile from the
+  left in the top row:
+
+      .|<2<\....
+      |v-v\^....
+      .v.v.|->>>
+      .v.v.v^.|.
+      .v.v.v^...
+      .v.v.v^..\
+      .v.v/2\\..
+      <-2-/vv|..
+      .|<<<2-|.\
+      .v//.|.v..
+
+  Using this configuration, 51 tiles are energized:
+
+      .#####....
+      .#.#.#....
+      .#.#.#####
+      .#.#.##...
+      .#.#.##...
+      .#.#.##...
+      .#.#####..
+      ########..
+      .#######..
+      .#...#.#..
+
+  Find the initial beam configuration that energizes the largest number of tiles; how many tiles
+  are energized in that configuration?
   """
 
   @doc "How many tiles are energized"
@@ -97,9 +140,7 @@ defmodule AdventOfCode.FloorWillBeLava do
     |> parse_input()
     |> traverse()
     |> elem(0)
-    |> Enum.map(&elem(&1, 0))
-    |> Enum.uniq()
-    |> Enum.count()
+    |> count_energized_tiles()
   end
 
   defp traverse(map, start \\ {{0, 0}, :right}, acc \\ [], memo \\ MapSet.new())
@@ -147,8 +188,7 @@ defmodule AdventOfCode.FloorWillBeLava do
     traverse(map, next(loc, :right), acc, memo)
   end
 
-  defp traverse_next(map, {loc, dir}, :vertical_split, acc, memo)
-       when dir in [:left, :right] do
+  defp traverse_next(map, {loc, dir}, :vertical_split, acc, memo) when dir in [:left, :right] do
     {acc, memo} = traverse(map, next(loc, :up), acc, memo)
     traverse(map, next(loc, :down), acc, memo)
   end
@@ -165,7 +205,48 @@ defmodule AdventOfCode.FloorWillBeLava do
 
   defp already_visited?(memo, tile), do: MapSet.member?(memo, hash(tile))
 
-  defp hash({{x, y}, dir}), do: :erlang.md5("#{x},#{y},#{dir}") |> Base.encode16(case: :lower)
+  defp hash({{x, y}, dir}) do
+    d =
+      case dir do
+        :left -> 0
+        :right -> 1
+        :up -> 2
+        :down -> 3
+      end
+
+    <<x::8, y::8, d::2>>
+  end
+
+  defp count_energized_tiles(list) do
+    list
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.uniq()
+    |> Enum.count()
+  end
+
+  # --- Part 2 ---
+
+  @doc "Maximum energized tiles count"
+  def final_answer(input) do
+    map = parse_input(input)
+
+    map
+    |> all_start_positions()
+    |> Enum.reduce(0, fn start, result ->
+      {acc, _memo} = traverse(map, start, [], MapSet.new())
+      max(count_energized_tiles(acc), result)
+    end)
+  end
+
+  defp all_start_positions(map) do
+    {x, y} = map |> Map.keys() |> Enum.max()
+    left_side(0, y) ++ right_side(x, y) ++ top_side(x, 0) ++ bottom_side(x, y)
+  end
+
+  defp left_side(0, max_y), do: Enum.map(0..max_y, fn y -> {{0, y}, :right} end)
+  defp right_side(max_x, max_y), do: Enum.map(0..max_y, fn y -> {{max_x, y}, :left} end)
+  defp top_side(max_x, 0), do: Enum.map(0..max_x, fn x -> {{x, 0}, :down} end)
+  defp bottom_side(max_x, max_y), do: Enum.map(0..max_x, fn x -> {{x, max_y}, :up} end)
 
   # --- Parser ---
 

@@ -181,4 +181,8 @@ defmodule AdventOfCode do
   def floor_will_be_lava do
     File.read!("priv/16_contraption_layout") |> AdventOfCode.FloorWillBeLava.answer()
   end
+
+  def floor_really_will_be_lava do
+    File.read!("priv/16_contraption_layout") |> AdventOfCode.FloorWillBeLava.final_answer()
+  end
 end
