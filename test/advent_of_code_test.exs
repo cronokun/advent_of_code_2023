@@ -128,4 +128,12 @@ defmodule AdventOfCodeTest do
   test "Day 16, part 2: Floor really will be lava" do
     assert AdventOfCode.floor_really_will_be_lava() == 7_130
   end
+
+  test "Day 17, part 1: Clumsy crucible" do
+    assert AdventOfCode.clumsy_crucible() == 936
+  end
+
+  # test "Day 17, part 2: Clumsy crucible" do
+  #   assert AdventOfCode.final_clumsy_crucible() == 1_157
+  # end
 end

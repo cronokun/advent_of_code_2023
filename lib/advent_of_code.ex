@@ -185,4 +185,8 @@ defmodule AdventOfCode do
   def floor_really_will_be_lava do
     File.read!("priv/16_contraption_layout") |> AdventOfCode.FloorWillBeLava.final_answer()
   end
+
+  def clumsy_crucible do
+    File.read!("priv/17_heat_map") |> AdventOfCode.ClumsyCrucible.answer()
+  end
 end
