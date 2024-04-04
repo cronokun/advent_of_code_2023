@@ -133,7 +133,7 @@ defmodule AdventOfCodeTest do
     assert AdventOfCode.clumsy_crucible() == 936
   end
 
-  # test "Day 17, part 2: Clumsy crucible" do
-  #   assert AdventOfCode.final_clumsy_crucible() == 1_157
-  # end
+  test "Day 17, part 2: Ultra clumsy crucible" do
+    assert AdventOfCode.ultra_clumsy_crucible() == 1_157
+  end
 end

@@ -187,6 +187,10 @@ defmodule AdventOfCode do
   end
 
   def clumsy_crucible do
-    File.read!("priv/17_heat_map") |> AdventOfCode.ClumsyCrucible.answer()
+    File.read!("priv/17_heat_map") |> AdventOfCode.ClumsyCrucible.answer(1, 3)
+  end
+
+  def ultra_clumsy_crucible do
+    File.read!("priv/17_heat_map") |> AdventOfCode.ClumsyCrucible.answer(4, 10)
   end
 end

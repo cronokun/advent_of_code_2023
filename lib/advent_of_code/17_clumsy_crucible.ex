@@ -2,6 +2,8 @@ defmodule AdventOfCode.ClumsyCrucible do
   @moduledoc ~S"""
   # Day 17: Clumsy Crucible
 
+  ## Part 1
+
   The lava starts flowing rapidly once the Lava Production Facility is operational. As you leave,
   the reindeer offers you a parachute, allowing you to quickly reach Gear Island.
 
@@ -72,6 +74,58 @@ defmodule AdventOfCode.ClumsyCrucible do
 
   Directing the crucible from the lava pool to the machine parts factory, but not moving more
   than three consecutive blocks in the same direction, what is the least heat loss it can incur?
+
+  ## Part Two
+
+  The crucibles of lava simply aren't large enough to provide an adequate supply of lava
+  to the machine parts factory. Instead, the Elves are going to upgrade to ultra crucibles.
+
+  Ultra crucibles are even more difficult to steer than normal crucibles. Not only do
+  they have trouble going in a straight line, but they also have trouble turning!
+
+  Once an ultra crucible starts moving in a direction, it needs to move a minimum of four
+  blocks in that direction before it can turn (or even before it can stop at the end).
+  However, it will eventually start to get wobbly: an ultra crucible can move a maximum
+  of ten consecutive blocks without turning.
+
+  In the above example, an ultra crucible could follow this path to minimize heat loss:
+
+      2>>>>>>>>1323
+      32154535v5623
+      32552456v4254
+      34465858v5452
+      45466578v>>>>
+      143859879845v
+      445787698776v
+      363787797965v
+      465496798688v
+      456467998645v
+      122468686556v
+      254654888773v
+      432267465553v
+
+  In the above example, an ultra crucible would incur the minimum possible heat loss of 94.
+
+  Here's another example:
+
+      111111111111
+      999999999991
+      999999999991
+      999999999991
+      999999999991
+
+  Sadly, an ultra crucible would need to take an unfortunate path like this one:
+
+      1>>>>>>>1111
+      9999999v9991
+      9999999v9991
+      9999999v9991
+      9999999v>>>>
+
+  This route causes the ultra crucible to incur the minimum possible heat loss of 71.
+
+  Directing the **ultra crucible** from the lava pool to the machine parts factory,
+  **what is the least heat loss it can incur?**
   """
 
   defmodule Queue do
@@ -96,54 +150,76 @@ defmodule AdventOfCode.ClumsyCrucible do
     end
   end
 
-  @doc "Return the least heat loss"
-  def answer(input) do
+  @doc "Return the least heat loss given min/max steps limit"
+  def answer(input, min_steps \\ 1, max_steps \\ 999) do
     {grid, target} = parse_input(input)
     next = {0, 0, 0, 0, 0, 0}
     queue = Queue.new()
     visited = MapSet.new()
-    find_min_cost(next, queue, visited, grid, target)
+    min_cost(next, queue, visited, grid, {min_steps, max_steps}, target)
   end
 
-  defp find_min_cost({cost, x, y, _, _, _}, _, _, _, {x, y}), do: cost
+  defp min_cost({cost, x, y, _, _, _}, _, _, _, _, {x, y}), do: cost
 
-  defp find_min_cost({cost, x, y, dx, dy, steps}, queue, visited, grid, target) do
+  defp min_cost({cost, x, y, dx, dy, steps}, queue, visited, grid, bounds, target) do
     {neighbours, visited} =
       if MapSet.member?(visited, {x, y, dx, dy, steps}) do
         {[], visited}
       else
-        add_neighbours({cost, x, y, dx, dy, steps}, visited, grid, target)
+        find_neighbours({cost, x, y, dx, dy, steps}, visited, grid, bounds, target)
       end
 
     {next, queue} = queue |> Queue.enqueue(neighbours) |> Queue.pop()
-    find_min_cost(next, queue, visited, grid, target)
+    min_cost(next, queue, visited, grid, bounds, target)
   end
 
-  defp add_neighbours({cost, x, y, dx, dy, steps}, visited, grid, target) do
+  defp find_neighbours({_cost, x, y, dx, dy, steps} = cur, visited, grid, limits, target) do
     visited = MapSet.put(visited, {x, y, dx, dy, steps})
-    next = maybe_add([], {cost, x + dx, y + dy, dx, dy, steps + 1}, {0, 0}, target, grid)
 
     next =
-      [{1, 0}, {-1, 0}, {0, 1}, {0, -1}]
-      |> Enum.reduce(next, fn {xx, yy}, acc ->
-        maybe_add(acc, {cost, x + xx, y + yy, xx, yy, 1}, {dx, dy}, target, grid)
-      end)
+      []
+      |> move_straight(cur, target, limits, grid)
+      |> turn(cur, target, limits, grid)
 
     {next, visited}
   end
 
-  defguard out_of_bounds(x, y, mx, my) when x < 0 or x > mx or y < 0 or y > my
-  defguard is_same_dir(dx, dy, px, py) when {dx, dy} == {px, py} or {dx, dy} == {-px, -py}
+  # Not moving yet, can't continue
+  defp move_straight(acc, {_, _, _, 0, 0, _}, _, _, _), do: acc
 
-  defp maybe_add(list, {_cost, x, y, dx, dy, steps}, {px, py}, {mx, my}, _grid)
-       when steps > 3 or {dx, dy} == {0, 0} or out_of_bounds(x, y, mx, my) or
-              is_same_dir(dx, dy, px, py),
-       do: list
+  defp move_straight(acc, {_, _, _, _, _, steps}, _, {_, maxs}, _) when steps + 1 > maxs, do: acc
 
-  defp maybe_add(list, {cost, x, y, dx, dy, steps}, _, _, grid) do
-    new_cost = cost + Map.get(grid, {x, y})
-    [{new_cost, x, y, dx, dy, steps} | list]
+  defp move_straight(acc, {cost, x, y, dx, dy, steps}, target, _limits, grid) do
+    maybe_add(acc, {cost, x, y, dx, dy, steps}, 1, target, grid)
   end
+
+  defp turn(acc, {cost, x, y, dx, dy, _steps}, target, {min_steps, _}, grid) do
+    [{1, 0}, {-1, 0}, {0, 1}, {0, -1}]
+    |> Enum.reject(&same_dir?(&1, {dx, dy}))
+    |> Enum.reduce(acc, fn {xx, yy}, acc ->
+      maybe_add(acc, {cost, x, y, xx, yy, 0}, min_steps, target, grid)
+    end)
+  end
+
+  defp maybe_add(list, {cost, x, y, dx, dy, steps}, ds, {mx, my}, grid) do
+    {xx, yy} = {x + dx * ds, y + dy * ds}
+    in_bounds = xx >= 0 and xx <= mx and yy >= 0 and yy <= my
+
+    if in_bounds do
+      new_cost = calc_cost(cost, {x, y}, {dx, dy}, ds, grid)
+      [{new_cost, xx, yy, dx, dy, steps + ds} | list]
+    else
+      list
+    end
+  end
+
+  defp calc_cost(cost, {x, y}, {dx, dy}, ds, grid) do
+    for i <- 1..ds, reduce: cost, do: (acc -> acc + Map.get(grid, {x + dx * i, y + dy * i}))
+  end
+
+  defp same_dir?({ax, 0}, {bx, 0}) when ax != 0 and bx != 0, do: true
+  defp same_dir?({0, ay}, {0, by}) when ay != 0 and by != 0, do: true
+  defp same_dir?(_, _), do: false
 
   # --- Parser ---
 
