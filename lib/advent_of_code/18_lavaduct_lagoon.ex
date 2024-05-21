@@ -111,10 +111,16 @@ defmodule AdventOfCode.LavaductLagoon do
 
   @doc "How many cubic meters of could be hold by dug out lagoon"
   def answer(input) do
-    {map, perim} = input |> parse() |> process_map()
-    # The solution is Shoelace formula + Pick's theorem:
-    calc_interior(map) + div(perim, 2) + 1
+    input |> parse() |> process_map() |> calculate()
   end
+
+  @doc "How many cubic meters of could be hold by dug out lagoon with corrected input"
+  def final_answer(input) do
+    input |> correct_input() |> process_map() |> calculate()
+  end
+
+  # The solution is Shoelace formula + Pick's theorem:
+  defp calculate({map, perim}), do: calc_interior(map) + div(perim, 2) + 1
 
   defp calc_interior(list) do
     {xf, yf} = hd(list)
@@ -159,5 +165,18 @@ defmodule AdventOfCode.LavaductLagoon do
   defp parse_line(line) do
     [d, n, _] = Regex.run(~r/(\w) (\d+) \(#(.{6})\)/, line, capture: :all_but_first)
     {d, String.to_integer(n)}
+  end
+
+  defp correct_input(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&correct_line/1)
+  end
+
+  defp correct_line(line) do
+    [hex, dir] = Regex.run(~r/\(#(\w{5})([0-3])\)/, line, capture: :all_but_first)
+    {n, ""} = Integer.parse(hex, 16)
+    d = %{"0" => "R", "1" => "D", "2" => "L", "3" => "U"}[dir]
+    {d, n}
   end
 end

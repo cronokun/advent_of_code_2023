@@ -140,4 +140,8 @@ defmodule AdventOfCodeTest do
   test "Day 18, part 1: Lavaduct lagoon" do
     assert AdventOfCode.lavaduct_lagoon() == 56_923
   end
+
+  test "Day 18, part 1: Corrected lavaduct lagoon" do
+    assert AdventOfCode.final_lavaduct_lagoon() == 66_296_566_363_189
+  end
 end

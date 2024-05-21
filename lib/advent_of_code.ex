@@ -197,4 +197,8 @@ defmodule AdventOfCode do
   def lavaduct_lagoon do
     File.read!("priv/18_dig_plan") |> AdventOfCode.LavaductLagoon.answer()
   end
+
+  def final_lavaduct_lagoon do
+    File.read!("priv/18_dig_plan") |> AdventOfCode.LavaductLagoon.final_answer()
+  end
 end
