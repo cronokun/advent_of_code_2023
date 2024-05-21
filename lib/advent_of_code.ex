@@ -201,4 +201,8 @@ defmodule AdventOfCode do
   def final_lavaduct_lagoon do
     File.read!("priv/18_dig_plan") |> AdventOfCode.LavaductLagoon.final_answer()
   end
+
+  def aplenty do
+    File.read!("priv/19_parts_and_workflows") |> AdventOfCode.Aplenty.answer()
+  end
 end

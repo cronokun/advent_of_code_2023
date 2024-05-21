@@ -141,7 +141,12 @@ defmodule AdventOfCodeTest do
     assert AdventOfCode.lavaduct_lagoon() == 56_923
   end
 
-  test "Day 18, part 1: Corrected lavaduct lagoon" do
+  test "Day 18, part 2: Corrected lavaduct lagoon" do
     assert AdventOfCode.final_lavaduct_lagoon() == 66_296_566_363_189
+  end
+
+  @tag :focus
+  test "Day 19, part 1: Aplenty" do
+    assert AdventOfCode.aplenty() == 352_052
   end
 end
