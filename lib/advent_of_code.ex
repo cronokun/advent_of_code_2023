@@ -193,4 +193,8 @@ defmodule AdventOfCode do
   def ultra_clumsy_crucible do
     File.read!("priv/17_heat_map") |> AdventOfCode.ClumsyCrucible.answer(4, 10)
   end
+
+  def lavaduct_lagoon do
+    File.read!("priv/18_dig_plan") |> AdventOfCode.LavaductLagoon.answer()
+  end
 end

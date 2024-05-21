@@ -136,4 +136,8 @@ defmodule AdventOfCodeTest do
   test "Day 17, part 2: Ultra clumsy crucible" do
     assert AdventOfCode.ultra_clumsy_crucible() == 1_157
   end
+
+  test "Day 18, part 1: Lavaduct lagoon" do
+    assert AdventOfCode.lavaduct_lagoon() == 56_923
+  end
 end
