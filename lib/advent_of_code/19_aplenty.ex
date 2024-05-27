@@ -2,7 +2,7 @@ defmodule AdventOfCode.Aplenty do
   @moduledoc """
   # Day 19: Aplenty
 
-  ## Day One
+  ## Part One
 
   The Elves of Gear Island are thankful for your help and send you on your way. They
   even have a hang glider that someone stole from Desert Island; since you're already
@@ -82,6 +82,26 @@ defmodule AdventOfCode.Aplenty do
 
   Sort through all of the parts you've been given; **what do you get if you add together
   all of the rating numbers for all of the parts that ultimately get accepted?**
+
+
+  ## Part Two
+
+  Even with your help, the sorting process still isn't fast enough.
+
+  One of the Elves comes up with a new plan: rather than sort parts individually through
+  all of these workflows, maybe you can figure out in advance which combinations of
+  ratings will be accepted or rejected.
+
+  Each of the four ratings (x, m, a, s) can have an integer value ranging from a minimum
+  of 1 to a maximum of 4000. Of all possible distinct combinations of ratings, your job
+  is to figure out which ones will be accepted.
+
+  In the above example, there are 167409079868000 distinct combinations of ratings that
+  will be accepted.
+
+  Consider only your list of workflows; the list of part ratings that the Elves wanted
+  you to sort is no longer relevant. **How many distinct combinations of ratings will be
+  accepted by the Elves' workflows?**
   """
 
   @doc "Sum of rating numbers of all accepted parts"
@@ -123,6 +143,64 @@ defmodule AdventOfCode.Aplenty do
       run_instruction(part, rest, workflows)
     end
   end
+
+  # --- Part Two ---
+
+  @doc "Returns number of combinations of all accepted parts"
+  def final_answer(input, range \\ 1..4000) do
+    {_, workflows} = parse(input)
+
+    %{"x" => range, "m" => range, "a" => range, "s" => range}
+    |> process(workflows, "in", [], [])
+    |> calc_combinations()
+  end
+
+  defp calc_combinations(parts) do
+    parts |> Enum.map(&part_comb/1) |> Enum.sum()
+  end
+
+  defp part_comb(part) do
+    part |> Map.values() |> Enum.reduce(1, fn rng, acc -> acc * Enum.count(rng) end)
+  end
+
+  defp process(_, _workflows, nil, [], acc), do: acc
+
+  defp process(parts, workflows, wname, todo, acc) do
+    {accepted, next} = process_workflow(parts, workflows[wname], [], [])
+    {nextp, nextw, todo} = get_next_workflow(todo ++ next)
+    process(nextp, workflows, nextw, todo, acc ++ accepted)
+  end
+
+  defp get_next_workflow([]), do: {nil, nil, []}
+  defp get_next_workflow([{nextw, nextp} | todo]), do: {nextp, nextw, todo}
+
+  defp process_workflow(parts, [{true, nil, nil, next_op}], next, acc) do
+    case next_op do
+      "A" -> {[parts | acc], next}
+      "R" -> {acc, next}
+      _ -> {acc, [{next_op, parts} | next]}
+    end
+  end
+
+  defp process_workflow(parts, [rule | rest], next, acc) do
+    case apply_rule(parts, rule) do
+      [{"A", p1}, {_, p2}] -> process_workflow(p2, rest, next, [p1 | acc])
+      [{"R", _p1}, {_, p2}] -> process_workflow(p2, rest, next, acc)
+      [next_rule, {_, p2}] -> process_workflow(p2, rest, [next_rule | next], acc)
+    end
+  end
+
+  defp apply_rule(parts, {op, attr, val, next}) do
+    {matched, unmatched} = split_range(parts[attr], val, op)
+
+    [
+      {next, Map.put(parts, attr, matched)},
+      {nil, Map.put(parts, attr, unmatched)}
+    ]
+  end
+
+  defp split_range(a..b, val, :gt) when val > a and val < b, do: {(val + 1)..b, a..val}
+  defp split_range(a..b, val, :lt) when val > a and val < b, do: {a..(val - 1), val..b}
 
   # ---  Parser ---
 

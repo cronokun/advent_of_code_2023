@@ -205,4 +205,8 @@ defmodule AdventOfCode do
   def aplenty do
     File.read!("priv/19_parts_and_workflows") |> AdventOfCode.Aplenty.answer()
   end
+
+  def aplenty_posibilities do
+    File.read!("priv/19_parts_and_workflows") |> AdventOfCode.Aplenty.final_answer()
+  end
 end
