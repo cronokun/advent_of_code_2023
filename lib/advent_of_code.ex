@@ -209,4 +209,8 @@ defmodule AdventOfCode do
   def aplenty_posibilities do
     File.read!("priv/19_parts_and_workflows") |> AdventOfCode.Aplenty.final_answer()
   end
+
+  def pulse_propagation do
+    File.read!("priv/20_module_config") |> AdventOfCode.PulsePropagation.answer()
+  end
 end

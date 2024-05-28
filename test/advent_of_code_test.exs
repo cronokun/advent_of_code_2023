@@ -152,4 +152,8 @@ defmodule AdventOfCodeTest do
   test "Day 19, part 2: Aplenty posibilities" do
     assert AdventOfCode.aplenty_posibilities() == 116_606_738_659_695
   end
+
+  test "Day 20, part 1: Pulse Propagation" do
+    assert AdventOfCode.pulse_propagation() == 886_701_120
+  end
 end
