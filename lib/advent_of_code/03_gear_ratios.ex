@@ -83,7 +83,7 @@ defmodule AdventOfCode.GearRatios do
   **What is the sum of all of the gear ratios in your engine schematic?**
   """
 
-  defguardp is_adjusent(l, r, idx) when idx in l..r or idx + 1 == l or idx - 1 == r
+  defguardp is_adjusent(l, r, idx) when idx >= l - 1 and idx <= r + 1
 
   @doc "Sum of all of the part numbers"
   def answer(input) do
@@ -119,7 +119,7 @@ defmodule AdventOfCode.GearRatios do
       indexes =
         Regex.scan(~r/\d+/, line, return: :index)
         |> List.flatten()
-        |> Enum.map(fn {i, len} -> i..(i + len - 1) end)
+        |> Enum.map(fn {i, len} -> {i, i + len - 1} end)
 
       {num, indexes}
     end
@@ -178,9 +178,10 @@ defmodule AdventOfCode.GearRatios do
     |> Enum.reject(&is_nil/1)
   end
 
-  defp return_part_number_for(line, l..r = range, idx, n)
-       when is_adjusent(l, r, idx) and not is_nil(line),
-       do: {String.slice(line, range), {range, n}}
+  defp return_part_number_for(nil, _, _, _), do: nil
+
+  defp return_part_number_for(line, {l, r} = range, idx, n) when is_adjusent(l, r, idx),
+    do: {String.slice(line, l, r - l + 1), {range, n}}
 
   defp return_part_number_for(_line, _range, _idx, _n), do: nil
 end
