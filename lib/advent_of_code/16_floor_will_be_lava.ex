@@ -138,120 +138,98 @@ defmodule AdventOfCode.FloorWillBeLava do
   def answer(input) do
     input
     |> parse_input()
+    |> elem(0)
     |> traverse()
     |> elem(0)
     |> count_energized_tiles()
   end
 
-  defp traverse(map, start \\ {{0, 0}, :right}, acc \\ [], memo \\ MapSet.new())
+  defp traverse(map, start \\ {0, 0, :right}, acc \\ MapSet.new(), memo \\ MapSet.new())
 
-  defp traverse(map, {loc, _dir} = tile, acc, memo) do
-    type = Map.get(map, loc)
+  defp traverse(map, {x, y, _dir} = tile, acc, memo) do
+    type = Map.get(map, {x, y})
 
-    if is_nil(type) or already_visited?(memo, tile) do
+    if is_nil(type) or MapSet.member?(memo, tile) do
       {acc, memo}
     else
-      {acc, memo} = put_tile(acc, memo, tile)
+      acc = MapSet.put(acc, {x, y})
+      memo = MapSet.put(memo, tile)
       traverse_next(map, tile, type, acc, memo)
     end
   end
 
-  defp traverse_next(map, {loc, dir}, :empty, acc, memo),
-    do: traverse(map, next(loc, dir), acc, memo)
+  defp traverse_next(map, {x, y, dir}, :empty, acc, memo),
+    do: traverse(map, next(x, y, dir), acc, memo)
 
-  defp traverse_next(map, {loc, :right}, :back_mirror, acc, memo),
-    do: traverse(map, next(loc, :down), acc, memo)
+  defp traverse_next(map, {x, y, :right}, :back_mirror, acc, memo),
+    do: traverse(map, next(x, y, :down), acc, memo)
 
-  defp traverse_next(map, {loc, :left}, :back_mirror, acc, memo),
-    do: traverse(map, next(loc, :up), acc, memo)
+  defp traverse_next(map, {x, y, :left}, :back_mirror, acc, memo),
+    do: traverse(map, next(x, y, :up), acc, memo)
 
-  defp traverse_next(map, {loc, :up}, :back_mirror, acc, memo),
-    do: traverse(map, next(loc, :left), acc, memo)
+  defp traverse_next(map, {x, y, :up}, :back_mirror, acc, memo),
+    do: traverse(map, next(x, y, :left), acc, memo)
 
-  defp traverse_next(map, {loc, :down}, :back_mirror, acc, memo),
-    do: traverse(map, next(loc, :right), acc, memo)
+  defp traverse_next(map, {x, y, :down}, :back_mirror, acc, memo),
+    do: traverse(map, next(x, y, :right), acc, memo)
 
-  defp traverse_next(map, {loc, :right}, :mirror, acc, memo),
-    do: traverse(map, next(loc, :up), acc, memo)
+  defp traverse_next(map, {x, y, :right}, :mirror, acc, memo),
+    do: traverse(map, next(x, y, :up), acc, memo)
 
-  defp traverse_next(map, {loc, :left}, :mirror, acc, memo),
-    do: traverse(map, next(loc, :down), acc, memo)
+  defp traverse_next(map, {x, y, :left}, :mirror, acc, memo),
+    do: traverse(map, next(x, y, :down), acc, memo)
 
-  defp traverse_next(map, {loc, :up}, :mirror, acc, memo),
-    do: traverse(map, next(loc, :right), acc, memo)
+  defp traverse_next(map, {x, y, :up}, :mirror, acc, memo),
+    do: traverse(map, next(x, y, :right), acc, memo)
 
-  defp traverse_next(map, {loc, :down}, :mirror, acc, memo),
-    do: traverse(map, next(loc, :left), acc, memo)
+  defp traverse_next(map, {x, y, :down}, :mirror, acc, memo),
+    do: traverse(map, next(x, y, :left), acc, memo)
 
-  defp traverse_next(map, {loc, dir}, :horizontal_split, acc, memo) when dir in [:up, :down] do
-    {acc, memo} = traverse(map, next(loc, :left), acc, memo)
-    traverse(map, next(loc, :right), acc, memo)
+  defp traverse_next(map, {x, y, dir}, :horizontal_split, acc, memo) when dir in [:up, :down] do
+    {acc, memo} = traverse(map, next(x, y, :left), acc, memo)
+    traverse(map, next(x, y, :right), acc, memo)
   end
 
-  defp traverse_next(map, {loc, dir}, :vertical_split, acc, memo) when dir in [:left, :right] do
-    {acc, memo} = traverse(map, next(loc, :up), acc, memo)
-    traverse(map, next(loc, :down), acc, memo)
+  defp traverse_next(map, {x, y, dir}, :vertical_split, acc, memo) when dir in [:left, :right] do
+    {acc, memo} = traverse(map, next(x, y, :up), acc, memo)
+    traverse(map, next(x, y, :down), acc, memo)
   end
 
-  defp traverse_next(map, {loc, dir}, _type, acc, memo),
-    do: traverse(map, next(loc, dir), acc, memo)
+  defp traverse_next(map, {x, y, dir}, _type, acc, memo),
+    do: traverse(map, next(x, y, dir), acc, memo)
 
-  defp next({x, y}, :down), do: {{x, y + 1}, :down}
-  defp next({x, y}, :left), do: {{x - 1, y}, :left}
-  defp next({x, y}, :right), do: {{x + 1, y}, :right}
-  defp next({x, y}, :up), do: {{x, y - 1}, :up}
+  defp next(x, y, :down), do: {x, y + 1, :down}
+  defp next(x, y, :left), do: {x - 1, y, :left}
+  defp next(x, y, :right), do: {x + 1, y, :right}
+  defp next(x, y, :up), do: {x, y - 1, :up}
 
-  defp put_tile(acc, memo, tile), do: {[tile | acc], MapSet.put(memo, hash(tile))}
-
-  defp already_visited?(memo, tile), do: MapSet.member?(memo, hash(tile))
-
-  defp hash({{x, y}, dir}) do
-    d =
-      case dir do
-        :left -> 0
-        :right -> 1
-        :up -> 2
-        :down -> 3
-      end
-
-    <<x::8, y::8, d::2>>
-  end
-
-  defp count_energized_tiles(list) do
-    list
-    |> Enum.map(&elem(&1, 0))
-    |> Enum.uniq()
-    |> Enum.count()
-  end
+  defp count_energized_tiles(acc), do: MapSet.size(acc)
 
   # --- Part 2 ---
 
   @doc "Maximum energized tiles count"
   def final_answer(input) do
-    map = parse_input(input)
+    {map, {max_x, max_y}} = parse_input(input)
 
-    map
-    |> all_start_positions()
+    all_start_positions(max_x, max_y)
     |> Enum.reduce(0, fn start, result ->
-      {acc, _memo} = traverse(map, start, [], MapSet.new())
+      {acc, _memo} = traverse(map, start)
       max(count_energized_tiles(acc), result)
     end)
   end
 
-  defp all_start_positions(map) do
-    {x, y} = map |> Map.keys() |> Enum.max()
-    left_side(0, y) ++ right_side(x, y) ++ top_side(x, 0) ++ bottom_side(x, y)
-  end
+  defp all_start_positions(x, y),
+    do: left_side(0, y) ++ right_side(x, y) ++ top_side(x, 0) ++ bottom_side(x, y)
 
-  defp left_side(0, max_y), do: Enum.map(0..max_y, fn y -> {{0, y}, :right} end)
-  defp right_side(max_x, max_y), do: Enum.map(0..max_y, fn y -> {{max_x, y}, :left} end)
-  defp top_side(max_x, 0), do: Enum.map(0..max_x, fn x -> {{x, 0}, :down} end)
-  defp bottom_side(max_x, max_y), do: Enum.map(0..max_x, fn x -> {{x, max_y}, :up} end)
+  defp left_side(0, max_y), do: Enum.map(0..max_y, fn y -> {0, y, :right} end)
+  defp right_side(max_x, max_y), do: Enum.map(0..max_y, fn y -> {max_x, y, :left} end)
+  defp top_side(max_x, 0), do: Enum.map(0..max_x, fn x -> {x, 0, :down} end)
+  defp bottom_side(max_x, max_y), do: Enum.map(0..max_x, fn x -> {x, max_y, :up} end)
 
   # --- Parser ---
 
   defp parse_input(input, loc \\ {0, 0}, acc \\ %{})
-  defp parse_input("", _, acc), do: acc
+  defp parse_input("\n", {x, y}, acc), do: {acc, {x, y}}
   defp parse_input("\n" <> rest, {_x, y}, acc), do: parse_input(rest, {0, y + 1}, acc)
 
   defp parse_input("." <> rest, {x, y}, acc),
