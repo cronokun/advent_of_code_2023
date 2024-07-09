@@ -160,75 +160,48 @@ defmodule AdventOfCode.PulsePropagation do
   that would be sent after pushing the button 1000 times, waiting for all pulses to be
   fully handled after each push of the button. **What do you get if you multiply the
   total number of low pulses sent by the total number of high pulses sent?**
+
+  ## Part Two
+
+  The final machine responsible for moving the sand down to Island Island has a module
+  attached named `rx`. The machine turns on when a single low pulse is sent to `rx`.
+
+  Reset all modules to their default states. Waiting for all pulses to be fully handled
+  after each button press, what is the fewest number of button presses required to deliver
+  a single low pulse to the module named `rx`?
   """
 
-  defmodule Config do
-    @moduledoc "Simple abstruction for the module configuration"
-
-    def new(list) do
-      list
-      |> Map.new()
-      |> set_conj_states()
-    end
-
-    def get(conf, name) do
-      Map.get(conf, name)
-    end
-
-    def update(conf, _, nil), do: conf
-
-    def update(conf, name, state) do
-      Map.update(conf, name, nil, fn {type, _state, dest} -> {type, state, dest} end)
-    end
-
-    defp set_conj_states(conf) do
-      all_conj_mods(conf)
-      |> Enum.reduce(conf, fn cname, c ->
-        state =
-          find_cong_inputs(conf, cname)
-          |> Enum.map(&{&1, :low})
-          |> Map.new()
-
-        Map.update(c, cname, nil, fn {type, _state, dest} -> {type, state, dest} end)
-      end)
-    end
-
-    defp all_conj_mods(conf) do
-      Enum.reduce(conf, [], fn
-        {name, {:conj, _, _}}, acc -> [name | acc]
-        _, acc -> acc
-      end)
-    end
-
-    defp find_cong_inputs(conf, cname) do
-      Enum.reduce(conf, [], fn {name, {_, _, dest}}, acc ->
-        if Enum.member?(dest, cname), do: [name | acc], else: acc
-      end)
-    end
+  @doc "Produc of total numbers of low and high pulses sent"
+  def answer(input) do
+    {_state, {ls, hs, _}} = push_button(parse(input), %{}, 1_000)
+    ls * hs
   end
 
-  @doc "Produc of total numbers of low and high pulses sent"
-  def answer(input, n \\ 1000) do
-    parse(input) |> push_button({0, 0}, n) |> Tuple.product()
+  def final_answer(input) do
+    config = parse(input)
+    targets = find_targets(config)
+    {_state, {_, _, targets}} = push_button(config, targets, 5_000)
+
+    # All cycle numbers are prime, so we can just multiply them:
+    Enum.reduce(targets, 1, fn {_, n}, acc -> acc * n end)
   end
 
   # --- Process signals ---
 
-  defp push_button(_conf, count, 0), do: count
-
-  defp push_button(conf, {lc, hc}, n) do
-    {conf, count} = process(conf, [{"broadcaster", "button", :low}], {lc + 1, hc})
-    push_button(conf, count, n - 1)
+  defp push_button(conf, targets, cycles) do
+    Enum.reduce(1..cycles, {conf, {0, 0, targets}}, fn n, {state, {ls, hs, ts}} ->
+      process(state, [{"broadcaster", "button", :low}], {ls + 1, hs, ts}, n)
+    end)
   end
 
-  defp process(conf, [], count), do: {conf, count}
+  defp process(conf, [], acc, _n), do: {conf, acc}
 
-  defp process(conf, [{name, _, _} = pulse | rest], count) do
-    mod = Config.get(conf, name)
-    {new_state, next} = process_pulse(pulse, mod)
-    conf = Config.update(conf, name, new_state)
-    new_count = update_counts(count, next)
-    process(conf, rest ++ next, new_count)
+  defp process(conf, [{name, _, _} = pulse | rest], acc, n) do
+    {new_state, next} = process_pulse(pulse, conf[name])
+    conf = update_config(conf, name, new_state)
+    acc = check_target_pulses(pulse, acc, n)
+    acc = update_pulse_counts(acc, next)
+    process(conf, rest ++ next, acc, n)
   end
 
   defp process_pulse({name, _from, pulse}, {:brod, _, dest}),
@@ -257,14 +230,21 @@ defmodule AdventOfCode.PulsePropagation do
     end
   end
 
-  defp update_counts({lc, hc}, next) do
-    {l, h} =
-      Enum.reduce(next, {0, 0}, fn
-        {_, _, :high}, {a, b} -> {a, b + 1}
-        {_, _, :low}, {a, b} -> {a + 1, b}
-      end)
+  defp check_target_pulses({_name, _from, :high}, acc, _n), do: acc
 
-    {lc + l, hc + h}
+  defp check_target_pulses({name, _from, :low}, {ls, hs, targets} = acc, n) do
+    if Map.has_key?(targets, name) do
+      {ls, hs, Map.put(targets, name, n)}
+    else
+      acc
+    end
+  end
+
+  defp update_pulse_counts(acc, next) do
+    Enum.reduce(next, acc, fn
+      {_, _, :high}, {ls, hs, ts} -> {ls, hs + 1, ts}
+      {_, _, :low}, {ls, hs, ts} -> {ls + 1, hs, ts}
+    end)
   end
 
   # --- Parser ---
@@ -273,7 +253,7 @@ defmodule AdventOfCode.PulsePropagation do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(&parse_line/1)
-    |> Config.new()
+    |> build_config()
   end
 
   defp parse_line(input) do
@@ -287,4 +267,55 @@ defmodule AdventOfCode.PulsePropagation do
   defp parse_module_name("%" <> name), do: {:flip, name, :off}
   defp parse_module_name("&" <> name), do: {:conj, name, %{}}
   defp parse_module_name(name), do: {:none, name, nil}
+
+  # --- Utils ---
+
+  defp build_config(modules) do
+    Map.new(modules) |> set_conj_states()
+  end
+
+  defp set_conj_states(conf) do
+    all_conj_mods(conf)
+    |> Enum.reduce(conf, fn cname, c ->
+      state =
+        find_conj_inputs(conf, cname)
+        |> Enum.map(&{&1, :low})
+        |> Map.new()
+
+      Map.update(c, cname, nil, fn {type, _state, dest} -> {type, state, dest} end)
+    end)
+  end
+
+  defp all_conj_mods(conf) do
+    Enum.reduce(conf, [], fn
+      {name, {:conj, _, _}}, acc -> [name | acc]
+      _, acc -> acc
+    end)
+  end
+
+  defp find_conj_inputs(conf, cname) do
+    Enum.reduce(conf, [], fn {name, {_, _, dest}}, acc ->
+      if Enum.member?(dest, cname), do: [name | acc], else: acc
+    end)
+  end
+
+  defp find_targets(conf, targets \\ ["rx"], level \\ 2)
+
+  defp find_targets(_config, targets, 0), do: Map.new(targets, & {&1, 0})
+
+  defp find_targets(config, targets, level) do
+    new_targets =
+      Enum.flat_map(targets, fn t ->
+        Map.filter(config, fn {_, {_, _, dest}} -> t in dest end) |> Map.keys()
+      end)
+
+    find_targets(config, new_targets, level - 1)
+  end
+
+  # Handle output nodes (like "rx") that don't have state
+  defp update_config(conf, _name, nil), do: conf
+
+  defp update_config(conf, name, state) do
+    Map.update(conf, name, nil, fn {type, _state, dest} -> {type, state, dest} end)
+  end
 end

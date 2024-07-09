@@ -213,4 +213,8 @@ defmodule AdventOfCode do
   def pulse_propagation do
     File.read!("priv/20_module_config") |> AdventOfCode.PulsePropagation.answer()
   end
+
+  def final_pulse_propagation do
+    File.read!("priv/20_module_config") |> AdventOfCode.PulsePropagation.final_answer()
+  end
 end
