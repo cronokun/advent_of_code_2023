@@ -217,4 +217,8 @@ defmodule AdventOfCode do
   def final_pulse_propagation do
     File.read!("priv/20_module_config") |> AdventOfCode.PulsePropagation.final_answer()
   end
+
+  def step_counter do
+    File.read!("priv/21_garden_map") |> AdventOfCode.StepCounter.answer()
+  end
 end

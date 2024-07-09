@@ -160,4 +160,8 @@ defmodule AdventOfCodeTest do
   test "Day 20, part 2: Final pulse propagation" do
     assert AdventOfCode.final_pulse_propagation() == 228_134_431_501_037
   end
+
+  test "Day 21, part 1: Step counter" do
+    assert AdventOfCode.step_counter() == 3_617
+  end
 end
