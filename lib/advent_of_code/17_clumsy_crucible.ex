@@ -1,5 +1,5 @@
 defmodule AdventOfCode.ClumsyCrucible do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 17: Clumsy Crucible
 
   ## Part 1
@@ -129,104 +129,114 @@ defmodule AdventOfCode.ClumsyCrucible do
   """
 
   defmodule Queue do
-    @moduledoc "Simple implementation of priority queue based on :gb_sets."
+    @moduledoc "Simple implementation of priority queue based on Heap."
 
-    defstruct [:set]
+    defstruct [:queue]
 
-    def new, do: %__MODULE__{set: :gb_sets.new()}
-
-    def enqueue(queue, elements) when is_list(elements) do
-      Enum.reduce(elements, queue, fn e, q -> put(q, e) end)
+    def new do
+      %__MODULE__{
+        queue: Heap.new(fn {a, _, _, _, _}, {b, _, _, _, _} -> a < b end)
+      }
     end
 
-    def put(queue, element) do
-      set = :gb_sets.add(element, queue.set)
-      %{queue | set: set}
+    def enqueue(pqueue, elements) when is_list(elements) do
+      Enum.reduce(elements, pqueue, fn e, q -> put(q, e) end)
     end
 
-    def pop(queue) do
-      {element, set} = :gb_sets.take_smallest(queue.set)
-      {element, %{queue | set: set}}
+    def put(pqueue, element) do
+      %{pqueue | queue: Heap.push(pqueue.queue, element)}
+    end
+
+    def pop(pqueue) do
+      {element, queue} = Heap.split(pqueue.queue)
+      {element, %{pqueue | queue: queue}}
     end
   end
 
   @doc "Return the least heat loss given min/max steps limit"
   def answer(input, min_steps \\ 1, max_steps \\ 999) do
     {grid, target} = parse_input(input)
-    next = {0, 0, 0, 0, 0, 0}
+    next = {0, 0, 0, nil, 0}
     queue = Queue.new()
     visited = MapSet.new()
-    min_cost(next, queue, visited, grid, {min_steps, max_steps}, target)
+    traverse(next, queue, visited, grid, {min_steps, max_steps}, target)
   end
 
-  defp min_cost({cost, x, y, _, _, _}, _, _, _, _, {x, y}), do: cost
+  defp traverse({cost, x, y, _, _}, _, _, _, _, {x, y}), do: cost
 
-  defp min_cost({cost, x, y, dx, dy, steps}, queue, visited, grid, bounds, target) do
-    {neighbours, visited} =
-      if MapSet.member?(visited, {x, y, dx, dy, steps}) do
-        {[], visited}
-      else
-        find_neighbours({cost, x, y, dx, dy, steps}, visited, grid, bounds, target)
-      end
-
-    {next, queue} = queue |> Queue.enqueue(neighbours) |> Queue.pop()
-    min_cost(next, queue, visited, grid, bounds, target)
+  defp traverse({cost, x, y, dir, steps}, queue, visited, grid, bounds, target) do
+    if MapSet.member?(visited, {x, y, dir, steps}) do
+      {next, queue} = Queue.pop(queue)
+      traverse(next, queue, visited, grid, bounds, target)
+    else
+      visited = MapSet.put(visited, {x, y, dir, steps})
+      neighbouts = find_neighbours({cost, x, y, dir, steps}, grid, bounds, target)
+      {next, queue} = Queue.enqueue(queue, neighbouts) |> Queue.pop()
+      traverse(next, queue, visited, grid, bounds, target)
+    end
   end
 
-  defp find_neighbours({_cost, x, y, dx, dy, steps} = cur, visited, grid, limits, target) do
-    visited = MapSet.put(visited, {x, y, dx, dy, steps})
-
-    next =
-      []
-      |> move_straight(cur, target, limits, grid)
-      |> turn(cur, target, limits, grid)
-
-    {next, visited}
+  defp find_neighbours(tile, grid, limits, target) do
+    []
+    |> move_straight(tile, target, limits, grid)
+    |> turn(tile, target, limits, grid)
   end
 
   # Not moving yet, can't continue
-  defp move_straight(acc, {_, _, _, 0, 0, _}, _, _, _), do: acc
+  defp move_straight(acc, {_, _, _, nil, _}, _, _, _), do: acc
 
-  defp move_straight(acc, {_, _, _, _, _, steps}, _, {_, maxs}, _) when steps + 1 > maxs, do: acc
+  # Max steps in one direction
+  defp move_straight(acc, {_, _, _, _, steps}, _, {_, steps}, _), do: acc
 
-  defp move_straight(acc, {cost, x, y, dx, dy, steps}, target, _limits, grid) do
-    maybe_add(acc, {cost, x, y, dx, dy, steps}, 1, target, grid)
+  defp move_straight(acc, {cost, x, y, dir, steps}, target, _limits, grid) do
+    maybe_add(acc, {cost, x, y, dir, steps}, 1, target, grid)
   end
 
-  defp turn(acc, {cost, x, y, dx, dy, _steps}, target, {min_steps, _}, grid) do
-    [{1, 0}, {-1, 0}, {0, 1}, {0, -1}]
-    |> Enum.reject(&same_dir?(&1, {dx, dy}))
-    |> Enum.reduce(acc, fn {xx, yy}, acc ->
-      maybe_add(acc, {cost, x, y, xx, yy, 0}, min_steps, target, grid)
+  defp turn(acc, {cost, x, y, dir, _steps}, target, {min_steps, _}, grid) do
+    case dir do
+      :left -> [:up, :down]
+      :right -> [:up, :down]
+      :up -> [:left, :right]
+      :down -> [:left, :right]
+      nil -> [:down, :right]
+    end
+    |> Enum.reduce(acc, fn dir, acc ->
+      maybe_add(acc, {cost, x, y, dir, 0}, min_steps, target, grid)
     end)
   end
 
-  defp maybe_add(list, {cost, x, y, dx, dy, steps}, ds, {mx, my}, grid) do
+  defp maybe_add(list, {cost, x, y, dir, steps}, ds, {mx, my}, grid) do
+    {dx, dy} = dir_to_delta(dir)
     {xx, yy} = {x + dx * ds, y + dy * ds}
     in_bounds = xx >= 0 and xx <= mx and yy >= 0 and yy <= my
 
     if in_bounds do
-      new_cost = calc_cost(cost, {x, y}, {dx, dy}, ds, grid)
-      [{new_cost, xx, yy, dx, dy, steps + ds} | list]
+      new_cost = calc_cost(cost, x, y, dx, dy, ds, grid)
+      [{new_cost, xx, yy, dir, steps + ds} | list]
     else
       list
     end
   end
 
-  defp calc_cost(cost, {x, y}, {dx, dy}, ds, grid) do
-    for i <- 1..ds, reduce: cost, do: (acc -> acc + Map.get(grid, {x + dx * i, y + dy * i}))
+  defp calc_cost(cost, x, y, dx, dy, ds, grid) do
+    Enum.reduce(1..ds, cost, fn i, acc -> acc + Map.get(grid, {x + dx * i, y + dy * i}) end)
   end
 
-  defp same_dir?({ax, 0}, {bx, 0}) when ax != 0 and bx != 0, do: true
-  defp same_dir?({0, ay}, {0, by}) when ay != 0 and by != 0, do: true
-  defp same_dir?(_, _), do: false
+  defp dir_to_delta(dir) do
+    case dir do
+      :left -> {-1, 0}
+      :right -> {1, 0}
+      :up -> {0, -1}
+      :down -> {0, 1}
+    end
+  end
 
   # --- Parser ---
 
-  defp parse_input(input, loc \\ {0, 0}, acc \\ [])
-  defp parse_input("\n", {x, y}, acc), do: {Map.new(acc), {x - 1, y}}
+  defp parse_input(input, loc \\ {0, 0}, acc \\ %{})
+  defp parse_input("\n", {x, y}, acc), do: {acc, {x - 1, y}}
   defp parse_input("\n" <> rest, {_x, y}, acc), do: parse_input(rest, {0, y + 1}, acc)
 
   defp parse_input(<<ch::utf8, rest::binary>>, {x, y}, acc),
-    do: parse_input(rest, {x + 1, y}, [{{x, y}, ch - ?0} | acc])
+    do: parse_input(rest, {x + 1, y}, Map.put(acc, {x, y}, ch - ?0))
 end
