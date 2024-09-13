@@ -221,4 +221,8 @@ defmodule AdventOfCode do
   def step_counter do
     File.read!("priv/21_garden_map") |> AdventOfCode.StepCounter.answer()
   end
+
+  def infinite_step_counter do
+    File.read!("priv/21_garden_map") |> AdventOfCode.InfiniteStepCounter.math_answer()
+  end
 end

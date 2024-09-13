@@ -164,4 +164,8 @@ defmodule AdventOfCodeTest do
   test "Day 21, part 1: Step counter" do
     assert AdventOfCode.step_counter() == 3_617
   end
+
+  test "Day 21, part 2: Infinite step counter" do
+    assert AdventOfCode.infinite_step_counter() == 596_857_397_104_703
+  end
 end
