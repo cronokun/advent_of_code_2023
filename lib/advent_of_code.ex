@@ -225,4 +225,8 @@ defmodule AdventOfCode do
   def infinite_step_counter do
     File.read!("priv/21_garden_map") |> AdventOfCode.InfiniteStepCounter.math_answer()
   end
+
+  def sand_slabs do
+    File.read!("priv/22_bricks_snapshot") |> AdventOfCode.SandSlabs.answer()
+  end
 end
