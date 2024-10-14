@@ -172,4 +172,8 @@ defmodule AdventOfCodeTest do
   test "Day 22, part 1: Sand slabs" do
     assert AdventOfCode.sand_slabs() == 426
   end
+
+  test "Day 22, part 2: Disintegrating sand slabs" do
+    assert AdventOfCode.disintegrating_sand_slabs() == 61_920
+  end
 end

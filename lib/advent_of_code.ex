@@ -229,4 +229,8 @@ defmodule AdventOfCode do
   def sand_slabs do
     File.read!("priv/22_bricks_snapshot") |> AdventOfCode.SandSlabs.answer()
   end
+
+  def disintegrating_sand_slabs do
+    File.read!("priv/22_bricks_snapshot") |> AdventOfCode.SandSlabs.final_answer()
+  end
 end

@@ -44,4 +44,29 @@ defmodule AdventOfCode.SandSlabsTest do
            5,1,55~6,1,55
            """) == 13
   end
+
+  @tag :focus
+  test ".final_answer/1 return the sum of the number of other bricks that would fall" do
+    assert final_answer(~S"""
+           1,0,1~1,2,1
+           0,0,2~2,0,2
+           0,2,3~2,2,3
+           0,0,4~0,2,4
+           2,0,5~2,2,5
+           0,1,6~2,1,6
+           1,1,8~1,1,9
+           """) == 7
+
+    assert final_answer(~S"""
+           0,0,0~3,0,0
+           5,0,0~5,0,0
+           0,0,1~1,0,1
+           3,0,1~5,0,1
+           0,0,2~0,0,2
+           1,0,2~1,0,2
+           4,0,2~4,0,2
+           1,0,3~4,0,3
+           2,0,4~3,0,4
+           """) == 7
+  end
 end
