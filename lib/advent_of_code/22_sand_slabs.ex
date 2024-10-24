@@ -1,3 +1,62 @@
+defmodule AdventOfCode.SandSlabs.Graph do
+  @moduledoc """
+  This struct represents a bricks graph. It keep track of:
+
+  - which bricks are above and below the given brick;
+
+  - if the given brick is a single prop for other bricks
+    (so removing it will make other bricks drop).
+  """
+
+  defstruct [:above, :below, :total, :uniq]
+
+  def new do
+    %__MODULE__{
+      above: %{},
+      below: %{},
+      total: 0,
+      uniq: %{}
+    }
+  end
+
+  def above(g, brk), do: g.above[brk]
+  def below(g, brk), do: g.below[brk]
+  def uniq_size(g), do: map_size(g.uniq)
+
+  # ---- Update graph --------
+
+  def put(g, {_, _, brick}, props) do
+    labels = Enum.map(props, &elem(&1, 2))
+
+    g
+    |> put_empty_above(brick)
+    |> put_above(brick, labels)
+    |> put_below(brick, labels)
+    |> put_uniq(brick, labels)
+    |> update_total()
+  end
+
+  defp put_empty_above(g, brk), do: put_in(g.above[brk], [])
+
+  defp put_above(g, brk, labels) do
+    Enum.reduce(labels, g, fn lbl, gg ->
+      update_in(gg.above, fn m -> Map.update(m, lbl, [brk], &[brk | &1]) end)
+    end)
+  end
+
+  defp put_below(g, brk, labels) do
+    update_in(g.below, fn m -> Map.update(m, brk, labels, &(labels ++ &1)) end)
+  end
+
+  defp put_uniq(g, brick, [label]) do
+    update_in(g.uniq, fn map -> Map.update(map, label, [brick], &[brick | &1]) end)
+  end
+
+  defp put_uniq(g, _brick, _labels), do: g
+
+  defp update_total(g), do: update_in(g.total, &(&1 + 1))
+end
+
 defmodule AdventOfCode.SandSlabs do
   @moduledoc """
   # Day 22: Sand Slabs
@@ -178,59 +237,7 @@ defmodule AdventOfCode.SandSlabs do
   **What is the sum of the number of other bricks that would fall?**
   """
 
-  defmodule Graph do
-    @moduledoc false
-
-    defstruct [:above, :below, :total, :uniq]
-
-    def new do
-      %__MODULE__{
-        above: %{},
-        below: %{},
-        total: 0,
-        uniq: MapSet.new()
-      }
-    end
-
-    def put(g, {_, _, brk}, []) do
-      g = put_in(g.below[brk], [])
-      update_in(g.total, &(&1 + 1))
-    end
-
-    def put(g, {_, _, brk}, [{_, _, label}]) do
-      g = update_in(g.uniq, &MapSet.put(&1, label))
-      g = update_in(g.above, fn m -> Map.update(m, label, [brk], &[brk | &1]) end)
-      g = update_in(g.below, fn m -> Map.update(m, brk, [label], &[label | &1]) end)
-      update_in(g.total, &(&1 + 1))
-    end
-
-    def put(g, {_, _, brk}, props) do
-      labels = Enum.map(props, &elem(&1, 2))
-
-      g =
-        Enum.reduce(labels, g, fn lbl, gg ->
-          update_in(gg.above, fn m -> Map.update(m, lbl, [brk], &[brk | &1]) end)
-        end)
-
-      g = update_in(g.below, fn m -> Map.update(m, brk, labels, &(labels ++ &1)) end)
-      update_in(g.total, &(&1 + 1))
-    end
-
-    def bricks_above(g, label), do: Map.fetch(g.above, label)
-
-    def prop?(g, brick), do: MapSet.member?(g.uniq, brick)
-
-    def uniq_size(g), do: MapSet.size(g.uniq)
-
-    def depenbable_bricks(g, brick, removed \\ MapSet.new()) do
-      g.above[brick]
-      |> List.wrap()
-      |> Enum.filter(fn b ->
-        bricks_below = g.below[b]
-        bricks_below == [brick] or Enum.all?(bricks_below, &MapSet.member?(removed, &1))
-      end)
-    end
-  end
+  alias AdventOfCode.SandSlabs.Graph
 
   @doc "How many bricks could be safely chosen as the one to get disintegrated?"
   def answer(input) do
@@ -244,33 +251,10 @@ defmodule AdventOfCode.SandSlabs do
 
   @doc "Sum of the number of other bricks that would fall?"
   def final_answer(input) do
-    graph =
-      input
-      |> parse()
-      |> apply_gravity()
-
-    Enum.reduce(1..graph.total, 0, fn blk, sum ->
-      sum + bricks_will_fall(graph, to_string(blk))
-    end)
-  end
-
-  # ---- Falling --------
-
-  def bricks_will_fall(graph, brk) do
-    bricks = Graph.depenbable_bricks(graph, brk)
-    total_blocks_above(graph, bricks, MapSet.new(bricks))
-  end
-
-  defp total_blocks_above(_graph, [], acc), do: MapSet.size(acc)
-
-  defp total_blocks_above(graph, [brk | rest], acc) do
-    case Graph.depenbable_bricks(graph, brk, acc) do
-      [] ->
-        total_blocks_above(graph, rest, acc)
-
-      bricks ->
-        total_blocks_above(graph, bricks ++ rest, MapSet.union(acc, MapSet.new(bricks)))
-    end
+    input
+    |> parse()
+    |> apply_gravity()
+    |> calc_drops()
   end
 
   # ---- Gravity --------
@@ -330,22 +314,41 @@ defmodule AdventOfCode.SandSlabs do
   defp update_brick({{x1, y1, z1}, {x2, y2, z2}, label}, zz),
     do: {{x1, y1, zz}, {x2, y2, zz + (z2 - z1)}, label}
 
+  # ---- Calculate drops --------
+
+  defp calc_drops(g) do
+    Enum.reduce(g.uniq, 0, fn {_brk, above}, total ->
+      droped = do_calc_drops(g, above, MapSet.new())
+      total + MapSet.size(droped)
+    end)
+  end
+
+  defp do_calc_drops(_g, [], droped), do: droped
+
+  defp do_calc_drops(g, bricks, droped) do
+    droped = MapSet.union(droped, MapSet.new(bricks))
+
+    above =
+      bricks
+      |> Enum.flat_map(&Graph.above(g, &1))
+      |> Enum.filter(&all_props_droped?(g, &1, droped))
+      |> Enum.uniq()
+
+    do_calc_drops(g, above, droped)
+  end
+
+  defp all_props_droped?(g, brk, droped) do
+    Enum.all?(Graph.below(g, brk), &MapSet.member?(droped, &1))
+  end
+
   # ---- Parser --------
 
   defp parse(input) do
     input
     |> String.split("\n", trim: true)
-    |> parse_lines()
+    |> Stream.with_index(1)
+    |> Stream.map(fn {line, i} -> parse_line(line, i) end)
     |> Enum.sort_by(fn {{_, _, z1}, {_, _, z2}, _} -> {z1, z2} end)
-  end
-
-  defp parse_lines(lines) do
-    lines
-    |> Enum.reduce({[], 0}, fn line, {acc, n} ->
-      n = n + 1
-      {[parse_line(line, n) | acc], n}
-    end)
-    |> elem(0)
   end
 
   @regex ~r/(\d+),(\d+),(\d+)~(\d+),(\d+),(\d+)/
@@ -355,6 +358,6 @@ defmodule AdventOfCode.SandSlabs do
       Regex.run(@regex, line, capture: :all_but_first)
       |> Enum.map(&String.to_integer/1)
 
-    {{x1, y1, z1}, {x2, y2, z2}, "#{n}"}
+    {{x1, y1, z1}, {x2, y2, z2}, n}
   end
 end

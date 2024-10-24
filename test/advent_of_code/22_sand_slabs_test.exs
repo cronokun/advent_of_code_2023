@@ -1,18 +1,148 @@
 defmodule AdventOfCode.SandSlabsTest do
+  @moduledoc """
+  # Test Inputs (mostly for part 2)
+
+  * Main test input
+
+    | # |  | # |
+    | # |  | # |
+    |###|  | # |
+    |# #|  |###|
+    |###|  |# #|
+    | # |  |###|
+    +---+  +---+
+      x      y
+
+  * Interlocked
+
+    Block A is uniq prop for C, but not for D (D is proped by B).
+
+    |  ##  |  |#|  I
+    | #### |  |#|  H
+    |##  # |  |#|  E, F, G
+    |## ###|  |#|  C, D
+    |#### #|  |#|  A, B
+    +------+  +-+
+        x      y
+
+  * Diamond
+
+    |  #  |
+    | ### |
+    |## ##|
+    | ### |
+    |  #  |
+    +-----+
+       x
+
+  * Reverse tree
+
+    |# # # #| |#|
+    |### ###| |#|
+    | ##### | |#|
+    |  ###  | |#|
+    +-------+ +-+
+        x      y
+
+  * Simple tower
+
+    | # |
+    | ##|
+    |  #|
+    | ##|
+    |## |
+    | ##|
+    |## |
+    +---+
+      x
+      
+  * Symetric layers
+
+    | ##### |
+    |### ###|
+    |# ### #|
+    |### ###|
+    |# # # #|
+    |#######|
+    +-------+
+        x
+  """
+
   use ExUnit.Case
 
   import AdventOfCode.SandSlabs
 
+  @main_test ~S"""
+  1,0,1~1,2,1
+  0,0,2~2,0,2
+  0,2,3~2,2,3
+  0,0,4~0,2,4
+  2,0,5~2,2,5
+  0,1,6~2,1,6
+  1,1,8~1,1,9
+  """
+
+  @interlocked ~S"""
+  0,0,0~3,0,0
+  5,0,0~5,0,0
+  0,0,1~1,0,1
+  3,0,1~5,0,1
+  0,0,2~0,0,2
+  1,0,2~1,0,2
+  4,0,2~4,0,2
+  1,0,3~4,0,3
+  2,0,4~3,0,4
+  """
+
+  @reverse_tree ~S"""
+  2,0,0~4,0,0
+  1,0,1~5,0,1
+  0,0,2~2,0,2
+  4,0,2~6,0,2
+  0,0,3~0,0,3
+  2,0,3~2,0,3
+  4,0,3~4,0,3
+  6,0,3~6,0,3
+  """
+
+  @diamond ~S"""
+  2,0,0~2,0,0
+  1,0,1~3,0,1
+  0,0,2~1,0,2
+  3,0,2~4,0,2
+  1,0,3~3,0,3
+  2,0,4~2,0,4
+  """
+
+  @simple_tower ~S"""
+  0,0,0~1,0,0
+  1,0,1~2,0,1
+  0,0,2~1,0,2
+  1,0,3~2,0,3
+  2,0,4~2,0,4
+  1,0,5~2,0,5
+  1,0,6~1,0,6
+  """
+
+  @symetric_layers ~S"""
+  0,0,0~6,0,0
+  0,0,1~0,0,1
+  2,0,1~2,0,1
+  4,0,1~4,0,1
+  6,0,1~6,0,1
+  0,0,2~2,0,2
+  3,0,2~6,0,2
+  0,0,3~0,0,3
+  2,0,3~4,0,3
+  6,0,3~6,0,3
+  0,0,4~2,0,4
+  3,0,4~6,0,4
+  1,0,5~5,0,5
+  """
+
   test ".answer/1 return how many bricks could be safely chosen as the one to get disintegrated" do
-    assert answer(~S"""
-           1,0,1~1,2,1
-           0,0,2~2,0,2
-           0,2,3~2,2,3
-           0,0,4~0,2,4
-           2,0,5~2,2,5
-           0,1,6~2,1,6
-           1,1,8~1,1,9
-           """) == 5
+    assert answer(@main_test) == 5
+    assert answer(@interlocked) == 5
   end
 
   test ".answer/1 sorts input by Z first" do
@@ -45,28 +175,12 @@ defmodule AdventOfCode.SandSlabsTest do
            """) == 13
   end
 
-  @tag :focus
   test ".final_answer/1 return the sum of the number of other bricks that would fall" do
-    assert final_answer(~S"""
-           1,0,1~1,2,1
-           0,0,2~2,0,2
-           0,2,3~2,2,3
-           0,0,4~0,2,4
-           2,0,5~2,2,5
-           0,1,6~2,1,6
-           1,1,8~1,1,9
-           """) == 7
-
-    assert final_answer(~S"""
-           0,0,0~3,0,0
-           5,0,0~5,0,0
-           0,0,1~1,0,1
-           3,0,1~5,0,1
-           0,0,2~0,0,2
-           1,0,2~1,0,2
-           4,0,2~4,0,2
-           1,0,3~4,0,3
-           2,0,4~3,0,4
-           """) == 7
+    assert final_answer(@simple_tower) == 21
+    assert final_answer(@main_test) == 7
+    assert final_answer(@reverse_tree) == 17
+    assert final_answer(@diamond) == 10
+    assert final_answer(@interlocked) == 7
+    assert final_answer(@symetric_layers) == 14
   end
 end
