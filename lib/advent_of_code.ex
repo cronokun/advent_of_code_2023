@@ -233,4 +233,8 @@ defmodule AdventOfCode do
   def disintegrating_sand_slabs do
     File.read!("priv/22_bricks_snapshot") |> AdventOfCode.SandSlabs.final_answer()
   end
+
+  def long_walk do
+    File.read!("priv/23_hiking_trails_map") |> AdventOfCode.LongWalk.answer()
+  end
 end
