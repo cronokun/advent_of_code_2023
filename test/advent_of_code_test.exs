@@ -180,4 +180,8 @@ defmodule AdventOfCodeTest do
   test "Day 23, part 1: Long walk" do
     assert AdventOfCode.long_walk() == 2_106
   end
+
+  test "Day 23, part 2: Really long walk" do
+    assert AdventOfCode.really_long_walk() == 6_350
+  end
 end

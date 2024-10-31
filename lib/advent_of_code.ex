@@ -237,4 +237,8 @@ defmodule AdventOfCode do
   def long_walk do
     File.read!("priv/23_hiking_trails_map") |> AdventOfCode.LongWalk.answer()
   end
+
+  def really_long_walk do
+    File.read!("priv/23_hiking_trails_map") |> AdventOfCode.ReallyLongWalk.answer()
+  end
 end

@@ -1,7 +1,7 @@
-defmodule AdventOfCode.LongWalkTest do
+defmodule AdventOfCode.ReallyLongWalkTest do
   use ExUnit.Case
 
-  import AdventOfCode.LongWalk
+  import AdventOfCode.ReallyLongWalk
 
   @test_input ~S"""
   #.#####################
@@ -29,7 +29,7 @@ defmodule AdventOfCode.LongWalkTest do
   #####################.#
   """
 
-  test ".answer/1 returns the number of steps of the longest hike" do
-    assert answer(@test_input) == 94
+  test ".answer/1 returns the number of steps of the really longest hike" do
+    assert answer(@test_input) == 154
   end
 end
