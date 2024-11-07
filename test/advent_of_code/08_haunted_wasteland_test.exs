@@ -1,5 +1,5 @@
 defmodule AdventOfCode.HauntedWastelandTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.HauntedWasteland
 
@@ -44,5 +44,15 @@ defmodule AdventOfCode.HauntedWastelandTest do
     """
 
     assert final_answer(input) == 6
+  end
+
+  @test_input File.read!("priv/08_desert_map")
+
+  test "Day 8, part 1" do
+    assert answer(@test_input) == 21_883
+  end
+
+  test "Day 8, part 2" do
+    assert final_answer(@test_input) == 12_833_235_391_111
   end
 end

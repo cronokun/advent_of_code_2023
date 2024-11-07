@@ -1,5 +1,5 @@
 defmodule AdventOfCode.GearRatios do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 3
 
   ## Part 1

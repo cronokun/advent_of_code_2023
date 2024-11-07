@@ -1,5 +1,5 @@
 defmodule AdventOfCode.LensLibrary do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 15: Lens Library
 
   ## --- Part 1 ---

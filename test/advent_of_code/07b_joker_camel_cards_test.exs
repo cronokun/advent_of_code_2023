@@ -1,5 +1,5 @@
 defmodule AdventOfCode.JokerCamelCardsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.JokerCamelCards
 
@@ -13,5 +13,11 @@ defmodule AdventOfCode.JokerCamelCardsTest do
     """
 
     assert answer(input) == 5905
+  end
+
+  @test_input File.read!("priv/07_hands_and_bids")
+
+  test "Day 7, part 2" do
+    assert answer(@test_input) == 252_113_488
   end
 end

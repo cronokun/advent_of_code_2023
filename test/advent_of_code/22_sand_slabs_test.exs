@@ -68,7 +68,7 @@ defmodule AdventOfCode.SandSlabsTest do
         x
   """
 
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.SandSlabs
 
@@ -182,5 +182,15 @@ defmodule AdventOfCode.SandSlabsTest do
     assert final_answer(@diamond) == 10
     assert final_answer(@interlocked) == 7
     assert final_answer(@symetric_layers) == 14
+  end
+
+  @test_input File.read!("priv/22_bricks_snapshot")
+
+  test "Day 22, part 1" do
+    assert answer(@test_input) == 426
+  end
+
+  test "Day 22, part 2" do
+    assert final_answer(@test_input) == 61_920
   end
 end

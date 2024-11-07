@@ -1,5 +1,5 @@
 defmodule AdventOfCode.GearRatiosTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.GearRatios
 
@@ -59,5 +59,15 @@ defmodule AdventOfCode.GearRatiosTest do
     """
 
     assert final_answer(input) == 467_835
+  end
+
+  @test_input File.read!("priv/03_engine_schematic")
+
+  test "Day 3, part 1" do
+    assert answer(@test_input) == 546_312
+  end
+
+  test "Day 3, part 2" do
+    assert final_answer(@test_input) == 87_449_461
   end
 end

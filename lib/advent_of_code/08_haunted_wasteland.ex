@@ -1,5 +1,5 @@
 defmodule AdventOfCode.HauntedWasteland do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 8: Haunted Wasteland
 
   ## Part 1

@@ -1,5 +1,5 @@
 defmodule AdventOfCode.MirageMaintenanceTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.MirageMaintenance
 
@@ -22,5 +22,15 @@ defmodule AdventOfCode.MirageMaintenanceTest do
 
     # [-3, 0, 5]
     assert final_answer(input) == 2
+  end
+
+  @test_input File.read!("priv/09_report")
+
+  test "Day 9, part 1" do
+    assert answer(@test_input) == 1_934_898_178
+  end
+
+  test "Day 9, part 2" do
+    assert final_answer(@test_input) == 1_129
   end
 end

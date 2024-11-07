@@ -1,5 +1,5 @@
 defmodule AdventOfCode.ParabolicReflectorDish do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 14: Parabolic Reflector Dish
 
   ## --- Part 1 ----

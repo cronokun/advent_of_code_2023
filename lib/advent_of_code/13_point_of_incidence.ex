@@ -1,5 +1,5 @@
 defmodule AdventOfCode.PointOfIncidence do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 13: Point of Incidence
 
   ## --- Part 1 ----

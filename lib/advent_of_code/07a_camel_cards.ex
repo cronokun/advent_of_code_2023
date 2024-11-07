@@ -1,5 +1,5 @@
 defmodule AdventOfCode.CamelCards do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 7: Camel Cards
 
   ## Part 1

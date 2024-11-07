@@ -1,5 +1,5 @@
 defmodule AdventOfCode.CubeConundrum do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 2
 
   ## Part 1
@@ -135,7 +135,7 @@ defmodule AdventOfCode.CubeConundrum do
   end
 
   @doc "Sum of the power of all sets"
-  def second_answer(input) do
+  def final_answer(input) do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(&parse_line/1)

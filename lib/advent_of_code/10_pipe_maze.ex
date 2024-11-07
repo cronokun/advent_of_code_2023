@@ -1,5 +1,5 @@
 defmodule AdventOfCode.PipeMaze do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 10: Pipe Maze
 
   ## Part 1

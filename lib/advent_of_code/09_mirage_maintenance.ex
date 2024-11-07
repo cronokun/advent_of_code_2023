@@ -1,5 +1,5 @@
 defmodule AdventOfCode.MirageMaintenance do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 9: Mirage Maintenance
 
   ## Part 1

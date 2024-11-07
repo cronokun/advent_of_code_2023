@@ -1,5 +1,5 @@
 defmodule AdventOfCode.InfiniteStepCounterTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.InfiniteStepCounter
 
@@ -105,5 +105,11 @@ defmodule AdventOfCode.InfiniteStepCounterTest do
     assert math_answer(map, 2 * 131 + 65) == 91_379
     assert math_answer(map, 4 * 131 + 65) == 295_727
     assert math_answer(map, 6 * 131 + 65) == 616_747
+  end
+
+  @test_input File.read!("priv/21_garden_map")
+
+  test "Day 21, part 2" do
+    assert math_answer(@test_input) == 596_857_397_104_703
   end
 end

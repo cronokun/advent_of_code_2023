@@ -1,5 +1,5 @@
 defmodule AdventOfCode.FloorWillBeLavaTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.FloorWillBeLava
 
@@ -35,5 +35,15 @@ defmodule AdventOfCode.FloorWillBeLavaTest do
     """
 
     assert final_answer(input) == 51
+  end
+
+  @test_input File.read!("priv/16_contraption_layout")
+
+  test "Day 16, part 1" do
+    assert answer(@test_input) == 6_622
+  end
+
+  test "Day 16, part 2" do
+    assert final_answer(@test_input) == 7_130
   end
 end

@@ -1,5 +1,5 @@
 defmodule AdventOfCode.BiggerFoodProductionProblem do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 5: If You Give A Seed A Fertilizer
 
   ## Part 2

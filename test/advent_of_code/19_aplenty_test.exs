@@ -1,5 +1,5 @@
 defmodule AdventOfCode.AplentyTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.Aplenty
 
@@ -47,5 +47,15 @@ defmodule AdventOfCode.AplentyTest do
              {x=2461,m=1339,a=466,s=291}
              {x=2127,m=1623,a=2188,s=1013}
              """)
+  end
+
+  @test_input File.read!("priv/19_parts_and_workflows")
+
+  test "Day 19, part 1" do
+    assert answer(@test_input) == 352_052
+  end
+
+  test "Day 19, part 2" do
+    assert final_answer(@test_input) == 116_606_738_659_695
   end
 end

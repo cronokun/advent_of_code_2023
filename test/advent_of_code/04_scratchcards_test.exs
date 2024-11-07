@@ -1,5 +1,5 @@
 defmodule AdventOfCode.ScratchcardsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.Scratchcards
 
@@ -27,5 +27,15 @@ defmodule AdventOfCode.ScratchcardsTest do
     """
 
     assert final_answer(input) == 30
+  end
+
+  @test_input File.read!("priv/04_cards_pile")
+
+  test "Day 4, part 1" do
+    assert answer(@test_input) == 21_568
+  end
+
+  test "Day 4, part 2" do
+    assert final_answer(@test_input) == 11_827_296
   end
 end

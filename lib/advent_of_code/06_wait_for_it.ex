@@ -1,5 +1,5 @@
 defmodule AdventOfCode.WaitForIt do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 6: Wait For It
 
   ## Part 1

@@ -1,5 +1,5 @@
 defmodule AdventOfCode.CosmicExpansion do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 11: Cosmic Expansion
 
   ## --- Part 1 ---

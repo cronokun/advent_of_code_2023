@@ -1,5 +1,5 @@
 defmodule AdventOfCode.WaitForItTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.WaitForIt
 
@@ -40,5 +40,15 @@ defmodule AdventOfCode.WaitForItTest do
     """
 
     assert final_answer(input) == 51
+  end
+
+  @test_input File.read!("priv/06_race_records")
+
+  test "Day 6, part 1" do
+    assert answer(@test_input) == 3_316_275
+  end
+
+  test "Day 6, part 2" do
+    assert final_answer(@test_input) == 27_102_791
   end
 end

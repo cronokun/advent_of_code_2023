@@ -1,5 +1,5 @@
 defmodule AdventOfCode.PipeMazeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.PipeMaze
 
@@ -114,5 +114,15 @@ defmodule AdventOfCode.PipeMazeTest do
     assert final_answer(input20) == 8
     assert final_answer(input30) == 10
     assert final_answer(input31) == 10
+  end
+
+  @test_input File.read!("priv/10_pipe_maze")
+
+  test "Day 10, part 1" do
+    assert answer(@test_input) == 6_927
+  end
+
+  test "Day 10, part 2" do
+    assert final_answer(@test_input) == 467
   end
 end

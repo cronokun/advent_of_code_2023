@@ -1,5 +1,5 @@
 defmodule AdventOfCode.Scratchcards do
-  @moduledoc ~S"""
+  @moduledoc """
   # Scratchcards
 
   ## Part 1

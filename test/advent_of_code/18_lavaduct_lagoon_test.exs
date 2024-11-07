@@ -1,5 +1,5 @@
 defmodule AdventOfCode.LavaductLagoonTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.LavaductLagoon
 
@@ -52,5 +52,15 @@ defmodule AdventOfCode.LavaductLagoonTest do
              L 2 (#015232)
              U 2 (#7a21e3)
              """)
+  end
+
+  @test_input File.read!("priv/18_dig_plan")
+
+  test "Day 18, part 1" do
+    assert answer(@test_input) == 56_923
+  end
+
+  test "Day 18, part 2" do
+    assert final_answer(@test_input) == 66_296_566_363_189
   end
 end

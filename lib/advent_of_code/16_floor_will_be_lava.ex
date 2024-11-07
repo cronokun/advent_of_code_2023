@@ -1,5 +1,5 @@
 defmodule AdventOfCode.FloorWillBeLava do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 16: The Floor Will Be Lava
 
   With the beam of light completely focused somewhere, the reindeer leads you deeper still into

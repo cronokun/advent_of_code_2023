@@ -1,5 +1,5 @@
 defmodule AdventOfCode.ClumsyCrucibleTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.ClumsyCrucible
 
@@ -126,5 +126,15 @@ defmodule AdventOfCode.ClumsyCrucibleTest do
                4,
                10
              )
+  end
+
+  @test_input File.read!("priv/17_heat_map")
+
+  test "Day 17, part 1" do
+    assert answer(@test_input, 1, 3) == 936
+  end
+
+  test "Day 17, part 2" do
+    assert answer(@test_input, 4, 10) == 1_157
   end
 end

@@ -1,5 +1,5 @@
 defmodule AdventOfCode.HotSprings do
-  @moduledoc ~S"""
+  @moduledoc """
   # Day 12: Hot Springs
 
   ## --- Part 1 ---

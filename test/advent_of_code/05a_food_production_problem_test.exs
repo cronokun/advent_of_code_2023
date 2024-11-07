@@ -1,5 +1,5 @@
 defmodule AdventOfCode.FoodProductionProblemTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import AdventOfCode.FoodProductionProblem
 
@@ -41,5 +41,11 @@ defmodule AdventOfCode.FoodProductionProblemTest do
     """
 
     assert answer(input) == 35
+  end
+
+  @test_input File.read!("priv/05_almanach")
+
+  test "Day 5, part 1" do
+    assert answer(@test_input) == 484_023_871
   end
 end
