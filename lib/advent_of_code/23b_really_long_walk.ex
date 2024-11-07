@@ -154,11 +154,24 @@ defmodule AdventOfCode.ReallyLongWalk do
 
   defp longest_concurent_walk(g) do
     [a, b] = g.verts[g.start]
-    visited = MapSet.new([g.start])
+    [a1, a2] = g.verts[a] -- [g.start]
+    [b1, b2] = g.verts[b] -- [g.start]
+
+    visited_a = MapSet.new([g.start, a])
+    visited_b = MapSet.new([g.start, b])
+
+    length_a = Graph.get_edge_length(g, {g.start, a})
+    length_b = Graph.get_edge_length(g, {g.start, b})
+    length_a1 = length_a + Graph.get_edge_length(g, {a, a1})
+    length_a2 = length_a + Graph.get_edge_length(g, {a, a2})
+    length_b1 = length_b + Graph.get_edge_length(g, {b, b1})
+    length_b2 = length_b + Graph.get_edge_length(g, {b, b2})
 
     [
-      {a, visited, Graph.get_edge_length(g, {g.start, a})},
-      {b, visited, Graph.get_edge_length(g, {g.start, b})}
+      {a1, visited_a, length_a1},
+      {a2, visited_a, length_a2},
+      {b1, visited_b, length_b1},
+      {b2, visited_b, length_b2}
     ]
     |> Enum.map(fn start ->
       Task.async(fn ->
