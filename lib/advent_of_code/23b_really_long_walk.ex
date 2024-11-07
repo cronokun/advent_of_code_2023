@@ -149,7 +149,24 @@ defmodule AdventOfCode.ReallyLongWalk do
     start = get_exit(map, 0)
     target = get_exit(map, max_y)
     graph = Graph.build(map, start, target)
-    longest_walk(graph)
+    longest_concurent_walk(graph)
+  end
+
+  defp longest_concurent_walk(g) do
+    [a, b] = g.verts[g.start]
+    visited = MapSet.new([g.start])
+
+    [
+      {a, visited, Graph.get_edge_length(g, {g.start, a})},
+      {b, visited, Graph.get_edge_length(g, {g.start, b})}
+    ]
+    |> Enum.map(fn start ->
+      Task.async(fn ->
+        longest_walk(g, [start], g.target, 0)
+      end)
+    end)
+    |> Enum.map(&Task.await(&1, :infinity))
+    |> Enum.max()
   end
 
   defp get_exit(map, target_row) do
@@ -159,8 +176,6 @@ defmodule AdventOfCode.ReallyLongWalk do
   end
 
   # ---- Traverse graph -------
-
-  defp longest_walk(g), do: longest_walk(g, [{g.start, MapSet.new(), 0}], g.target, 0)
 
   defp longest_walk(_g, [], _target, longest), do: longest
 
