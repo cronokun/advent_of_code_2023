@@ -128,30 +128,7 @@ defmodule AdventOfCode.ClumsyCrucible do
   **what is the least heat loss it can incur?**
   """
 
-  defmodule Queue do
-    @moduledoc "Simple implementation of priority queue based on Heap."
-
-    defstruct [:queue]
-
-    def new do
-      %__MODULE__{
-        queue: Heap.new(fn {a, _, _, _, _}, {b, _, _, _, _} -> a < b end)
-      }
-    end
-
-    def enqueue(pqueue, elements) when is_list(elements) do
-      Enum.reduce(elements, pqueue, fn e, q -> put(q, e) end)
-    end
-
-    def put(pqueue, element) do
-      %{pqueue | queue: Heap.push(pqueue.queue, element)}
-    end
-
-    def pop(pqueue) do
-      {element, queue} = Heap.split(pqueue.queue)
-      {element, %{pqueue | queue: queue}}
-    end
-  end
+  alias AdventOfCode.Utils.Queue
 
   @doc "Return the least heat loss given min/max steps limit"
   def answer(input, min_steps \\ 1, max_steps \\ 999) do
@@ -170,8 +147,8 @@ defmodule AdventOfCode.ClumsyCrucible do
       traverse(next, queue, visited, grid, bounds, target)
     else
       visited = MapSet.put(visited, {x, y, dir, steps})
-      neighbouts = find_neighbours({cost, x, y, dir, steps}, grid, bounds, target)
-      {next, queue} = Queue.enqueue(queue, neighbouts) |> Queue.pop()
+      neighbours = find_neighbours({cost, x, y, dir, steps}, grid, bounds, target)
+      {next, queue} = Queue.enqueue(queue, neighbours) |> Queue.pop()
       traverse(next, queue, visited, grid, bounds, target)
     end
   end
